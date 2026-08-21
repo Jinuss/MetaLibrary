@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>《仙逆》意境体系总览 · 王林的道与天下意境</title>
+<style>
+  :root{
+    --bg:#0a0c12; --panel:#151823; --panel2:#1c2030; --ink:#e8eaf0;
+    --sub:#8b94a8; --line:#2a3040; --gold:#e9c46a; --jade:#4ec9b0;
+    --red:#e76f6b; --blue:#5b9bd5; --purple:#b587d6; --orange:#e98a4b;
+    --green:#6bcb77; --cyan:#4dd0e1;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:linear-gradient(160deg,#07090f 0%,#0a0c12 50%,#0f1219 100%);
+    color:var(--ink);font-family:"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+    line-height:1.8;padding:40px 20px;min-height:100vh}
+  .wrap{max-width:1100px;margin:0 auto}
+
+  header{text-align:center;padding:40px 20px 50px;border-bottom:1px solid var(--line);margin-bottom:40px;position:relative}
+  header::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);width:120px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+  .brand{font-size:12px;letter-spacing:6px;color:var(--gold);text-transform:uppercase;margin-bottom:14px}
+  h1{font-size:40px;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,var(--gold) 0%,var(--orange) 50%,var(--red) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:12px}
+  header .subtitle{color:var(--sub);font-size:15px;letter-spacing:2px}
+  header .quote-main{margin-top:20px;font-size:14px;color:var(--gold);font-style:italic;opacity:.8}
+
+  section{margin-bottom:48px}
+  .sec-title{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+  .sec-title .num{font-size:28px;font-weight:800;color:var(--gold);opacity:.3}
+  .sec-title h2{font-size:24px;font-weight:700;letter-spacing:2px}
+  .sec-title .bar{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:28px 30px;margin-bottom:24px;position:relative;overflow:hidden;transition:border-color .2s}
+  .card:hover{border-color:var(--accent,var(--gold))}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent,var(--gold))}
+
+  .intro-quote{background:var(--panel2);border-left:3px solid var(--gold);padding:18px 22px;border-radius:0 10px 10px 0;
+    margin:16px 0;font-size:14px;color:var(--sub);line-height:2}
+  .intro-quote b{color:var(--ink)}
+  .intro-quote .src{color:var(--gold);font-size:12px;margin-top:8px;display:block;opacity:.7}
+
+  /* 意境系统三阶 */
+  .system-grid{display:grid;grid-template-columns:1fr;gap:20px}
+  .sys-row{display:grid;grid-template-columns:auto 1fr 1fr 1fr;align-items:center;gap:0;
+    background:var(--panel2);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .sys-row .label{padding:18px 20px;font-weight:700;font-size:15px;color:var(--gold);text-align:center;
+    border-right:1px solid var(--line);min-width:80px}
+  .sys-row .cell{padding:18px 16px;text-align:center;border-right:1px solid var(--line)}
+  .sys-row .cell:last-child{border-right:none}
+  .sys-row .cell .stage{font-size:18px;font-weight:700;margin-bottom:6px}
+  .sys-row .cell .desc{font-size:12px;color:var(--sub)}
+  @media(max-width:700px){.sys-row{grid-template-columns:1fr}.sys-row .label{border-right:none;border-bottom:1px solid var(--line)}.sys-row .cell{border-right:none;border-bottom:1px solid var(--line)}}
+
+  /* 王林三大意境 */
+  .realm-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:30px;margin-bottom:24px;position:relative;overflow:hidden}
+  .realm-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--accent)}
+  .realm-card .rc-head{display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+  .rc-num{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:20px;font-weight:800;color:#0a0c12;background:var(--accent);flex-shrink:0}
+  .rc-title{font-size:22px;font-weight:700;letter-spacing:2px}
+  .rc-subtitle{font-size:13px;color:var(--sub);margin-top:4px}
+  .rc-phase{font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;
+    background:rgba(255,255,255,.05);color:var(--accent);margin-left:auto;white-space:nowrap}
+  .rc-body{color:var(--ink);font-size:14px;line-height:2}
+  .rc-body p{margin-bottom:12px}
+  .rc-body .key{color:var(--accent);font-weight:600}
+  .rc-quote{background:var(--panel2);border-left:3px solid var(--accent);padding:14px 18px;
+    border-radius:0 8px 8px 0;margin:14px 0;font-size:13px;color:var(--sub);line-height:2}
+  .rc-quote b{color:var(--ink)}
+  .rc-ability{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .ability-tag{font-size:12px;padding:5px 14px;border-radius:8px;
+    background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink)}
+  .ability-tag b{color:var(--accent)}
+
+  /* 七道本源 */
+  .origin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+  .origin-item{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:18px 20px;transition:transform .15s,border-color .15s}
+  .origin-item:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .origin-item .oi-num{font-size:11px;color:var(--sub);letter-spacing:2px;margin-bottom:6px}
+  .origin-item .oi-name{font-size:16px;font-weight:700;margin-bottom:8px;color:var(--accent)}
+  .origin-item .oi-desc{font-size:12px;color:var(--sub);line-height:1.7}
+  .origin-item .oi-source{font-size:11px;color:var(--gold);margin-top:8px;opacity:.8}
+
+  /* 天下意境表 */
+  .yijing-table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+  .yijing-table th{background:var(--panel2);color:var(--gold);font-size:12px;letter-spacing:2px;
+    padding:14px 16px;text-align:left;border-bottom:1px solid var(--line)}
+  .yijing-table td{padding:14px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+  .yijing-table tr:last-child td{border-bottom:none}
+  .yijing-table tr:hover td{background:rgba(255,255,255,.02)}
+  .yj-name{font-weight:700;color:var(--ink)}
+  .yj-wielder{color:var(--jade);font-size:13px}
+  .yj-desc{color:var(--sub);font-size:13px;line-height:1.8}
+  .yj-tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;margin-top:4px;
+    background:rgba(255,255,255,.05);color:var(--accent)}
+
+  /* 蜕变流程 */
+  .evolution-flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin:20px 0}
+  .evo-step{flex:1;min-width:200px;background:var(--panel2);border:1px solid var(--line);
+    padding:20px;text-align:center;position:relative;border-radius:10px;margin:4px}
+  .evo-step .es-stage{font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:8px}
+  .evo-step .es-name{font-size:16px;font-weight:700;margin-bottom:6px;color:var(--accent)}
+  .evo-step .es-detail{font-size:12px;color:var(--sub);line-height:1.7}
+  .evo-arrow{text-align:center;font-size:20px;color:var(--gold);align-self:center;padding:0 4px}
+  @media(max-width:600px){.evo-arrow{transform:rotate(90deg);padding:8px 0}}
+
+  /* 逆修 */
+  .nixiu-card{background:linear-gradient(135deg,rgba(231,111,107,.08),rgba(233,138,75,.08));
+    border:1px solid rgba(231,111,107,.2);border-radius:16px;padding:28px 30px}
+  .nixiu-card h3{font-size:18px;font-weight:700;color:var(--red);margin-bottom:14px;letter-spacing:2px}
+  .nixiu-card p{font-size:14px;color:var(--ink);line-height:2;margin-bottom:10px}
+  .nixiu-card p .key{color:var(--gold);font-weight:600}
+
+  .r1{--accent:var(--jade)} .r2{--accent:var(--purple)} .r3{--accent:var(--orange)}
+  .o1{--accent:var(--jade)} .o2{--accent:var(--blue)} .o3{--accent:var(--purple)}
+  .o4{--accent:var(--cyan)} .o5{--accent:var(--red)} .o6{--accent:var(--green)} .o7{--accent:var(--gold)}
+
+  footer{text-align:center;color:var(--sub);font-size:12px;padding:30px 0 10px;border-top:1px solid var(--line);margin-top:40px;line-height:1.8}
+  footer .src-note{font-size:11px;opacity:.6;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">耳根 · 逆修之道</div>
+    <h1>《仙逆》意境体系总览</h1>
+    <p class="subtitle">王林的三大意境与书中独特意境全解</p>
+    <p class="quote-main">"顺为凡，逆则仙，只在心中一念间"</p>
+  </header>
+
+  <!-- 一、意境系统总论 -->
+  <section>
+    <div class="sec-title">
+      <span class="num">01</span>
+      <h2>意境系统总论</h2>
+      <span class="bar"></span>
+    </div>
+
+    <div class="card" style="--accent:var(--gold)">
+      <p style="font-size:15px;line-height:2;color:var(--ink)">
+        <b style="color:var(--gold)">意境</b>，是《仙逆》修真体系中化神期及以上修士的核心力量来源。修士感悟天道，将所悟之道凝聚为意境，意境可实质化为画轴、印记等形态，更是通往<b style="color:var(--gold)">本源</b>与<b style="color:var(--gold)">信念</b>两大更高层次的根基。
+      </p>
+      <div class="intro-quote">
+        <b>法术、道术、信术！</b><br>
+        这三种不同的神通，对应的便是意境的两次蜕变：<b>法术对应意境，道术对应本源，信术，则是对应信念！</b><br>
+        <span class="src">——原文</span>
+      </div>
+      <div class="intro-quote">
+        <b>本源之力，一切规则意境的根本。</b>明悟了本源，就等于把这雷之意境与规则彻底看透，如此没有意境限制，修为之增，骇然听闻！<br>
+        <span class="src">——原文</span>
+      </div>
+      <p style="font-size:14px;color:var(--sub);line-height:2;margin-top:16px">
+        值得注意的是：<b style="color:var(--ink)">仙人不修意境</b>——仙界修士以仙力强开天地之力，不修道境；<b style="color:var(--ink)">太古星辰修士也不修意境</b>——他们全部修为都在眉心印记之上，依靠传承之物开启越多则修为越高。意境，是界内修士（修真界）所独有的道之体现。
+      </p>
+    </div>
+
+    <div class="system-grid">
+      <div class="sys-row" style="--accent:var(--jade)">
+        <div class="label">神通<br>层次</div>
+        <div class="cell"><div class="stage" style="color:var(--jade)">法术</div><div class="desc">对应意境<br>化神期修士施展</div></div>
+        <div class="cell"><div class="stage" style="color:var(--blue)">道术</div><div class="desc">对应本源<br>入道境大能施展</div></div>
+        <div class="cell"><div class="stage" style="color:var(--purple)">信术</div><div class="desc">对应信念<br>唯大天尊方可施展</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 二、王林的三大意境 -->
+  <section>
+    <div class="sec-title">
+      <span class="num">02</span>
+      <h2>王林的三大意境</h2>
+      <span class="bar"></span>
+    </div>
+
+    <div class="intro-quote" style="border-color:var(--gold);margin-bottom:28px">
+      <b>王林修道五百余年感悟生死轮回，至九百余年生死轮回圆满化作因果循环，至一千多年因果圆满，二次转化成为真假之境！</b><br>
+      每一个，都是他独自明悟出的道，亦或者，是他思想的转变，从一个默默无闻的小小修士，一路走到现在……这道，包含了雷、火、战，包含了生死、因果、真假！<br>
+      <span class="src">——原文</span>
+    </div>
+
+    <!-- 第一意境：生死轮回意境 -->
+    <div class="realm-card r1">
+      <div class="rc-head">
+        <div class="rc-num">壹</div>
+        <div>
+          <div class="rc-title">生死轮回意境</div>
+          <div class="rc-subtitle">轮回天道分支 · 第一意境 · 约五百年感悟</div>
+        </div>
+        <span class="rc-phase">法术 → 意境层</span>
+      </div>
+      <div class="rc-body">
+        <p>王林所感悟的<b class="key">生死意境</b>，源自轮回天道的分支。他在古庙顿悟中，于凡人世间感悟天道轮回，从生与死的脉搏中明悟何为生、何为死，最终凝聚出此意境。</p>
+        <p>此意境可<b class="key">实质化</b>为「<b class="key">生死轮回画轴</b>」——黑白二色从天灵散出，迅速交融，蓦然间化作画轴铺盖天空。画轴之内，蕴含生死交替之力，可笼罩一国之境。</p>
+      </div>
+      <div class="rc-quote">
+        王林眉头一皱，但立刻便放松下来，<b>生死轮回意境</b>，顿时从身体内扩散而出，紧接着，在其天灵之上，散发出<b>黑白二色</b>，这黑白二色迅速交融，蓦然间，化作<b>生死轮回画轴</b>！<br>
+        <span class="src">——原文</span>
+      </div>
+      <div class="rc-quote">
+        "因果，<b>生死轮回意境之后，又一表现</b>，甚至可以说，这因果，便是生与死的本源，因为有了生，所以才会结出死亡的果……"<br>
+        <span class="src">——原文</span>
+      </div>
+      <div class="rc-ability">
+        <span class="ability-tag"><b>实质化：</b>生死轮回画轴</span>
+        <span class="ability-tag"><b>范围：</b>可笼罩整国</span>
+        <span class="ability-tag"><b>衍生：</b>生死印</span>
+        <span class="ability-tag"><b>本源：</b>生死本源</span>
+        <span class="ability-tag"><b>配合：</b>杀戮仙诀</span>
+      </div>
+    </div>
+
+    <!-- 第二意境：因果循环意境 -->
+    <div class="realm-card r2">
+      <div class="rc-head">
+        <div class="rc-num">贰</div>
+        <div>
+          <div class="rc-title">因果循环意境</div>
+          <div class="rc-subtitle">生死之后的深化 · 第一次蜕变 · 约九百年圆满</div>
+        </div>
+        <span class="rc-phase">道术 → 本源层</span>
+      </div>
+      <div class="rc-body">
+        <p><b class="key">生死之后便是因果</b>。王林的意境在第一次蜕变后，便如同凡界中的大儒，思绪有了顿悟，他不畏了生死，更深层次的追寻这道的真谛。</p>
+        <p>因果，是生与死的本源——因为有了生，所以才会结出死亡的果。此意境在因果意境无法实质化之前，王林另辟蹊径，以<b class="key">吞噬</b>和<b class="key">借别人之道印证因果</b>的方式，最终使因果意境大成。</p>
+      </div>
+      <div class="rc-quote">
+        生死之后便是因果，王林的意境在<b>第一次蜕变</b>后，便如同凡界中的大儒，思绪有了顿悟，他不畏了生死，更深层次的追寻这道的真谛。<br>
+        <span class="src">——原文</span>
+      </div>
+      <div class="rc-quote">
+        "正确的道路，并非吞噬，而是<b>借以感悟！借别人之道，印证因果！</b>这，才是使得因果意境大成的正确法门！"<br>
+        <span class="src">——原文</span>
+      </div>
+      <div class="rc-ability">
+        <span class="ability-tag"><b>实质化：</b>因果印</span>
+        <span class="ability-tag"><b>因果印：</b>掌开为天地之因，握住为灭世之果，过程为缘</span>
+        <span class="ability-tag"><b>本源：</b>因果本源</span>
+      </div>
+    </div>
+
+    <!-- 第三意境：真假意境 -->
+    <div class="realm-card r3">
+      <div class="rc-head">
+        <div class="rc-num">叁</div>
+        <div>
+          <div class="rc-title">真假意境</div>
+          <div class="rc-subtitle">因果之后的升华 · 第二次蜕变 · 约千年转化</div>
+        </div>
+        <span class="rc-phase">信术 → 信念层</span>
+      </div>
+      <div class="rc-body">
+        <p>至一千多年因果圆满，<b class="key">二次转化成为真假之境</b>。这是王林意境的第二次蜕变，也是最高阶的形态。</p>
+        <p>眉心意境之星消散，诞生了第三道真假本源。在真假道之下，天地万物一切虚假也成真，这是一种欺骗天道排斥之力的至高道术。</p>
+      </div>
+      <div class="rc-quote">
+        闭目瞬息，王林双眼猛地一睁，在其睁开双目的瞬间，<b>天地万物，一切虚假也成真</b>，这就是他从真假本源内，悟出的神通，<b>真假道</b>！<br>
+        <span class="src">——原文</span>
+      </div>
+      <div class="rc-quote">
+        "火、雷、战与我自身的<b>真假意境</b>，若能融合，我修为可进，天人衰劫下，将再无我之敌手！"<br>
+        <span class="src">——原文</span>
+      </div>
+      <div class="rc-ability">
+        <span class="ability-tag"><b>神通：</b>真假永恒印（第五道本源凝聚成印）</span>
+        <span class="ability-tag"><b>神通：</b>真假道（天地万物虚假成真）</span>
+        <span class="ability-tag"><b>本源：</b>真假本源</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 三、意境的两次蜕变 -->
+  <section>
+    <div class="sec-title">
+      <span class="num">03</span>
+      <h2>意境的两次蜕变</h2>
+      <span class="bar"></span>
+    </div>
+
+    <div class="card" style="--accent:var(--gold)">
+      <p style="font-size:14px;color:var(--sub);line-height:2;margin-bottom:20px">
+        王林的意境经历了两次关键蜕变，每次蜕变都对应着修真体系中神通层次的根本跃迁：
+      </p>
+      <div class="evolution-flow">
+        <div class="evo-step" style="--accent:var(--jade)">
+          <div class="es-stage">初始阶段</div>
+          <div class="es-name">生死轮回意境</div>
+          <div class="es-detail">感悟轮回天道分支<br>可化生死轮回画轴<br>约五百年修道感悟</div>
+        </div>
+        <div class="evo-arrow">→</div>
+        <div class="evo-step" style="--accent:var(--purple)">
+          <div class="es-stage">第一次蜕变</div>
+          <div class="es-name">因果循环意境</div>
+          <div class="es-detail">不畏生死，深追道之真谛<br>因果即生死之本源<br>约九百年圆满转化</div>
+        </div>
+        <div class="evo-arrow">→</div>
+        <div class="evo-step" style="--accent:var(--orange)">
+          <div class="es-stage">第二次蜕变</div>
+          <div class="es-name">真假之境</div>
+          <div class="es-detail">因果圆满后二次转化<br>天地万物虚假成真<br>约千年以上转化</div>
+        </div>
+      </div>
+      <div class="intro-quote" style="margin-top:16px">
+        <b>法术</b>对应<b>意境</b> · <b>道术</b>对应<b>本源</b> · <b>信术</b>对应<b>信念</b><br>
+        <span class="src">——意境的两次蜕变对应着这三种神通层次的递进</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 四、王林的七道本源 -->
+  <section>
+    <div class="sec-title">
+      <span class="num">04</span>
+      <h2>王林的七道本源</h2>
+      <span class="bar"></span>
+    </div>
+
+    <div class="card" style="--accent:var(--gold)">
+      <p style="font-size:14px;color:var(--ink);line-height:2">
+        王林以三大意境（生死、因果、真假）为核心，又融合了雷、火、战等规则意境，最终拥有<b style="color:var(--gold)">七道本源</b>——古往今来前所未有。原文记载："你体内有五道本源，天资惊人，<b style="color:var(--gold)">古往今来我从未听说有人可以诞生五道本源</b>"，而王林更可继续获得第八、第九乃至第十道本源。
+      </p>
+    </div>
+
+    <div class="origin-grid">
+      <div class="origin-item o1">
+        <div class="oi-num">第一道</div>
+        <div class="oi-name">生死本源</div>
+        <div class="oi-desc">三大核心本源之一。从生死轮回意境凝聚而来，崩溃了生机后明悟。</div>
+        <div class="oi-source">来源：生死轮回意境</div>
+      </div>
+      <div class="origin-item o2">
+        <div class="oi-num">第二道</div>
+        <div class="oi-name">因果本源</div>
+        <div class="oi-desc">三大核心本源之一。碎灭了古星后感受到，因果即生死的本源。</div>
+        <div class="oi-source">来源：因果循环意境</div>
+      </div>
+      <div class="origin-item o3">
+        <div class="oi-num">第三道</div>
+        <div class="oi-name">真假本源</div>
+        <div class="oi-desc">三大核心本源之一。眉心意境之星消散后诞生，可化真假永恒印、真假道。</div>
+        <div class="oi-source">来源：真假意境</div>
+      </div>
+      <div class="origin-item o4">
+        <div class="oi-num">第四道</div>
+        <div class="oi-name">雷本源</div>
+        <div class="oi-desc">规则本源。与火本源融合后修为从空涅初期升至空涅中期。</div>
+        <div class="oi-source">来源：规则之星</div>
+      </div>
+      <div class="origin-item o5">
+        <div class="oi-num">第五道</div>
+        <div class="oi-name">火本源</div>
+        <div class="oi-desc">规则本源。虚火之后化为道火，道火燃起则雷火本源彻底大成。</div>
+        <div class="oi-source">来源：规则之星</div>
+      </div>
+      <div class="origin-item o6">
+        <div class="oi-num">第六道</div>
+        <div class="oi-name">战本源</div>
+        <div class="oi-desc">规则本源。吸收战空野的战之意境感悟而来，与雷火融合为一体。</div>
+        <div class="oi-source">来源：战空野的战之意境</div>
+      </div>
+      <div class="origin-item o7">
+        <div class="oi-num">第七道</div>
+        <div class="oi-name">禁制本源</div>
+        <div class="oi-desc">彻底炼化鬼脸帆后，禁制之力可化为第七道本源，冲击空灵后期。</div>
+        <div class="oi-source">来源：鬼脸帆</div>
+      </div>
+    </div>
+
+    <div class="intro-quote" style="margin-top:20px">
+      这种规则，蕴含在了<b>真与假</b>之中，伴随着<b>雷、火、战</b>，成为了天地间，<b>独属于王林的道</b>！这道，包含了雷、火、战，包含了<b>生死、因果、真假</b>！<br>
+      <span class="src">——原文</span>
+    </div>
+  </section>
+
+  <!-- 五、逆修与意境 -->
+  <section>
+    <div class="sec-title">
+      <span class="num">05</span>
+      <h2>逆修 · 王林意境的独特根基</h2>
+      <span class="bar"></span>
+    </div>
+
+    <div class="nixiu-card">
+      <h3>顺修与逆修</h3>
+      <p><span class="key">顺修</span>：循天道而修，融合天地元气与元神，问鼎时引动常规变化。</p>
+      <p><span class="key">逆修</span>：逆天而行，引动「<b style="color:var(--gold)">真正的天劫</b>」——天道之惩罚，不受界域破碎影响。</p>
+      <p>王林为逆修者，以生死轮回意境蜕变，"<b style="color:var(--gold)">披星斩月，低头踏天</b>"。</p>
+      <div class="intro-quote" style="margin-top:16px;border-color:var(--red)">
+        随着仙界的破碎，天劫已经消失，但，消失的不是<b>真正的天劫</b>，而是由仙人引动，这是仙劫！<b>真正的天劫，是天道的惩罚</b>，是不会因为任何一界的破碎而消失，它只会在该出现的时候，才会出现！<br>
+        <span class="src">——原文</span>
+      </div>
+      <div class="intro-quote" style="border-color:var(--red)">
+        "世间修士，若有<b>逆修</b>出现，无不想尽一切办法躲避天道惩罚……"<br>
+        "还有当年我在妖灵之地问鼎天劫，第一次见到古妖塔珈之时，此妖曾言，<b>古为第一代逆修，战天道而亡</b>，此后繁衍三族，为第二代战天道之修……"<br>
+        <span class="src">——原文</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 六、书中其他独特意境 -->
+  <section>
+    <div class="sec-title">
+      <span class="num">06</span>
+      <h2>书中其他独特典型意境</h2>
+      <span class="bar"></span>
+    </div>
+
+    <table class="yijing-table">
+      <thead>
+        <tr>
+          <th style="width:14%">意境名称</th>
+          <th style="width:12%">拥有者</th>
+          <th style="width:10%">特点</th>
+          <th>详细描述</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="--accent:var(--jade)">
+          <td><span class="yj-name">岁月意境</span></td>
+          <td><span class="yj-wielder">青衫老者<br>（青松师叔）</span></td>
+          <td><span class="yj-tag" style="color:var(--jade)">模仿轮回</span></td>
+          <td class="yj-desc">剑走偏锋，模仿轮回天道而来，<b>并非真正的轮回</b>。王林真正感受轮回天道后，认为青衫老者的岁月意境只不过是对轮回天道的拙劣模仿。但此意境可通过木雕传承，感悟者可获得对岁月流逝的特殊感悟。</td>
+        </tr>
+        <tr>
+          <td><span class="yj-name">绝情意境</span></td>
+          <td><span class="yj-wielder">红蝶</span></td>
+          <td><span class="yj-tag" style="color:var(--red)">至情至绝</span></td>
+          <td class="yj-desc">红蝶此生的天道感悟。看似有情至极，实则内心无情。此意境在分身体内成倍积累，蕴含绝情天道之力，被王林以生死意境配合鲜血变化后模仿雕刻，但与真正的绝情意境仍有差距。</td>
+        </tr>
+        <tr>
+          <td><span class="yj-name">千幻无情道</span></td>
+          <td><span class="yj-wielder">柳眉</span></td>
+          <td><span class="yj-tag" style="color:var(--purple)">表里不一</span></td>
+          <td class="yj-desc">"<b>在众多有情的掩饰下，蕴含着一颗无情的心</b>"。外在幻化一切有情表象，唯独内心无情。与王林的生死轮回感悟本质相同——"天若有情，自然不成为道"。此道可使人以炉鼎之术吞噬他人意境，成就自身。</td>
+        </tr>
+        <tr>
+          <td><span class="yj-name">痴情意境</span></td>
+          <td><span class="yj-wielder">周佚</span></td>
+          <td><span class="yj-tag" style="color:var(--orange)">世间罕见</span></td>
+          <td class="yj-desc">"<b>此子的痴情意境，世间罕见</b>"。周佚问鼎期所悟，与仙尸女子之间的故事——"<b>他生她死、他死她生</b>"，让王林明白了"看生不是生，看死不是死"的含义，是王林感悟生死轮回的重要契机之一。</td>
+        </tr>
+        <tr>
+          <td><span class="yj-name">战之意境</span></td>
+          <td><span class="yj-wielder">战星野<br>战空野</span></td>
+          <td><span class="yj-tag" style="color:var(--green)">传承之物</span></td>
+          <td class="yj-desc">战星野早年无意中获得<b>战字贴</b>，自行琢磨感悟而出。战空野亦拥有此意境。此意境可被吸收融合（虽未完全融合），使吸收者获得与碎涅后期修士一战的决心。王林吸收了战空野的战之意境，最终凝为战本源。</td>
+        </tr>
+        <tr>
+          <td><span class="yj-name">霸道意境</span></td>
+          <td><span class="yj-wielder">凌天候<br>（剑尊）</span></td>
+          <td><span class="yj-tag" style="color:var(--gold)">越弱越强</span></td>
+          <td class="yj-desc">蕴含在凌天候的剑气之中。"<b>你越示弱，他便越强</b>"——这是一种遇弱则强的霸道意境，剑气速度极快，且意境会随对方示弱而不断增强，极为难缠。</td>
+        </tr>
+        <tr>
+          <td><span class="yj-name">雷之意境</span></td>
+          <td><span class="yj-wielder">孙泰</span></td>
+          <td><span class="yj-tag" style="color:var(--cyan)">闭关百年</span></td>
+          <td class="yj-desc">孙泰在天雷星<b>闭关百年</b>感悟而来，花费了极大代价。属于规则意境的一种，明悟本源后可将此意境与规则彻底看透，不受意境限制。</td>
+        </tr>
+        <tr>
+          <td><span class="yj-name">茶之意境</span></td>
+          <td><span class="yj-wielder">未具名修士</span></td>
+          <td><span class="yj-tag" style="color:var(--blue)">封印之术</span></td>
+          <td class="yj-desc">极为特殊的意境，可与封印结合形成<b>无法破除的强大封印</b>。丹药融化瞬间也会被此封印吸走灵力。茶之意境留在脸上会使人奇丑无比，令人望之心惊。</td>
+        </tr>
+        <tr>
+          <td><span class="yj-name">杀之意境</span></td>
+          <td><span class="yj-wielder">未具名修士</span></td>
+          <td><span class="yj-tag" style="color:var(--red)">杀气凝聚</span></td>
+          <td class="yj-desc">由杀人凝聚杀气，杀气多了成煞气，煞气浓郁成液再成晶。煞气血晶若非修炼杀之意境者碰触，必然被杀气伤到元神。与杀戮仙诀相配，可依靠杀戮获得生机之力凝结生之烙印。</td>
+        </tr>
+        <tr>
+          <td><span class="yj-name">无相天魔道</span></td>
+          <td><span class="yj-wielder">幻家先祖<br>→幻无情</span></td>
+          <td><span class="yj-tag" style="color:var(--purple)">仙人遗留</span></td>
+          <td class="yj-desc">幻家先祖在仙界未崩溃前，于冥想中与<b>域外天魔</b>纠缠，最终结合自身感悟顿化而出。因"<b>仙人不修意境</b>"，此感悟被留下送给后人。幻家后人凭此在仙界崩溃后站稳脚步，分为多重神通。</td>
+        </tr>
+        <tr>
+          <td><span class="yj-name">荣耀意境</span></td>
+          <td><span class="yj-wielder">姚家<br>（姚族）</span></td>
+          <td><span class="yj-tag" style="color:var(--gold)">仙人后代</span></td>
+          <td class="yj-desc">姚族为仙人后代，"仙人不修意境，但我等后人，却是以<b>荣耀为意境</b>，昔日先祖之荣耀，便是我姚族之道境！"——以先祖荣耀作为道境的独特修法。</td>
+        </tr>
+        <tr>
+          <td><span class="yj-name">淫邪意境</span></td>
+          <td><span class="yj-wielder">魅姬</span></td>
+          <td><span class="yj-tag" style="color:var(--red)">魂魄崩散</span></td>
+          <td class="yj-desc">魅姬所修的极强意境。最终魅姬以特殊方法使魂魄崩散，连同淫邪意境一并卷向柳眉体内，意图助柳眉万幻天魔道大成。</td>
+        </tr>
+        <tr>
+          <td><span class="yj-name">道念意境</span></td>
+          <td><span class="yj-wielder">泛指</span></td>
+          <td><span class="yj-tag" style="color:var(--sub)">规则弥漫</span></td>
+          <td class="yj-desc">蕴含规则之力的意境。可搅乱心神，甚至使对方意境险些崩溃。王林体内存在无形漩涡，可吸引吞噬四周一切道念意境，使卢云从的道念意境几乎崩溃。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 七、王林意境的独特性 -->
+  <section>
+    <div class="sec-title">
+      <span class="num">07</span>
+      <h2>王林意境的独特性</h2>
+      <span class="bar"></span>
+    </div>
+
+    <div class="card" style="--accent:var(--gold)">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">
+        <div>
+          <h3 style="font-size:16px;color:var(--gold);margin-bottom:10px">三次自主明悟</h3>
+          <p style="font-size:13px;color:var(--sub);line-height:2">生死轮回、因果循环、真假之变——每一个都是王林独自明悟出的道，不是传承，不是模仿，是他思想的转变与人生的成长。</p>
+        </div>
+        <div>
+          <h3 style="font-size:16px;color:var(--gold);margin-bottom:10px">逆修根基</h3>
+          <p style="font-size:13px;color:var(--sub);line-height:2">王林是逆修者，引动真正的天劫而非仙劫。逆修者出现本身便是天道惩罚降临的条件，这与他的生死轮回意境相辅相成。</p>
+        </div>
+        <div>
+          <h3 style="font-size:16px;color:var(--gold);margin-bottom:10px">七道本源前无古人</h3>
+          <p style="font-size:13px;color:var(--sub);line-height:2">古往今来从未有人可以诞生五道本源，而王林拥有七道，且因不吸收香火，不存在第三步后无法大成的致命缺陷，更可继续获得第八、第九乃至第十道。</p>
+        </div>
+        <div>
+          <h3 style="font-size:16px;color:var(--gold);margin-bottom:10px">三境归一</h3>
+          <p style="font-size:13px;color:var(--sub);line-height:2">三大本源真身（生死、因果、真假）归一后凝聚唯一真身，达到真神程度——这是大天尊之上的终极层次。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="intro-quote" style="margin-top:20px;border-color:var(--gold)">
+      <b>王林生死轮回，因果循环，真假之变，每一个，都是他独自明悟出的道</b>，亦或者，是他思想的转变，从一个默默无闻的小小修士，一路走到现在，如今的他，已然可以屹立于众强之中，这种变化，亦是王林人生的成长。<br>
+      <span class="src">——原文</span>
+    </div>
+  </section>
+
+  <footer>
+    《仙逆》· 耳根 著 ｜ 意境体系依据原文关键词检索整理<br>
+    <span class="src-note">数据来源：《仙逆》.txt 全文检索（"意境"出现920次，"生死意境"63次，"生死轮回"90次，"本源"2326次）</span>
+  </footer>
+
+</div>
+</body>
+</html>
