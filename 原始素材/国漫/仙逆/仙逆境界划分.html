@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>《仙逆》境界划分体系</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --panel2:#1e2230; --ink:#e8eaf0;
+    --sub:#9aa3b8; --line:#2a3040; --gold:#e9c46a; --jade:#4ec9b0;
+    --red:#e76f6b; --blue:#5b9bd5; --purple:#b587d6; --orange:#e98a4b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:linear-gradient(160deg,#0a0c12 0%,#0f1117 60%,#12131c 100%);
+    color:var(--ink);font-family:"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+    line-height:1.75;padding:40px 20px;min-height:100vh}
+  .wrap{max-width:1080px;margin:0 auto}
+  header{text-align:center;padding:30px 20px 40px;border-bottom:1px solid var(--line);margin-bottom:40px}
+  .brand{font-size:13px;letter-spacing:6px;color:var(--gold);text-transform:uppercase;margin-bottom:12px}
+  h1{font-size:38px;font-weight:800;letter-spacing:4px;background:linear-gradient(90deg,var(--gold),var(--orange));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:10px}
+  header p{color:var(--sub);font-size:15px}
+  .step-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:28px 30px 32px;margin-bottom:28px;position:relative;overflow:hidden}
+  .step-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .step-head{display:flex;align-items:center;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+  .step-badge{font-size:12px;font-weight:700;letter-spacing:2px;padding:5px 14px;border-radius:20px;
+    background:var(--accent);color:#0f1117}
+  .step-title{font-size:22px;font-weight:700;letter-spacing:2px}
+  .step-desc{color:var(--sub);font-size:13px;margin-left:auto}
+  .realm-list{display:flex;flex-direction:column;gap:10px}
+  .realm{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:16px;
+    background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px 18px;
+    transition:transform .15s, border-color .15s}
+  .realm:hover{transform:translateX(4px);border-color:var(--accent)}
+  .realm .no{font-size:13px;font-weight:700;color:var(--accent);text-align:center;
+    border:1px solid var(--accent);border-radius:50%;width:30px;height:30px;line-height:28px;justify-self:center}
+  .realm .name{font-size:17px;font-weight:700;letter-spacing:1px}
+  .realm .name small{display:block;font-size:12px;font-weight:400;color:var(--sub);letter-spacing:0;margin-top:2px}
+  .realm .tag{font-size:12px;color:var(--sub);text-align:right;max-width:300px}
+  .s1{--accent:var(--jade)} .s2{--accent:var(--blue)} .s3{--accent:var(--purple)}
+  .trans{--accent:var(--orange)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}.realm{grid-template-columns:36px 1fr}.realm .tag{display:none}}
+  .sub-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+  .sub-card h3{font-size:17px;font-weight:700;margin-bottom:14px;color:var(--gold);letter-spacing:1px;
+    padding-bottom:10px;border-bottom:1px dashed var(--line)}
+  .sub-card ul{list-style:none}
+  .sub-card li{padding:7px 0 7px 22px;position:relative;font-size:14px;color:var(--ink)}
+  .sub-card li::before{content:"◈";position:absolute;left:0;color:var(--accent,var(--gold));font-size:11px}
+  .sub-card li b{color:var(--gold);font-weight:600}
+  .sub-card li em{color:var(--sub);font-style:normal}
+  .quote{background:var(--panel2);border-left:3px solid var(--gold);padding:14px 16px;border-radius:0 8px 8px 0;
+    margin:14px 0;font-size:13px;color:var(--sub);line-height:1.8}
+  .quote b{color:var(--ink)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  table th,table td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  table th{color:var(--gold);font-size:12px;letter-spacing:1px;background:var(--panel2)}
+  table td b{color:var(--jade)}
+  footer{text-align:center;color:var(--sub);font-size:12px;padding:30px 0 10px;border-top:1px solid var(--line);margin-top:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">耳根 · 逆修之路</div>
+    <h1>《仙逆》境界划分体系</h1>
+    <p>依据小说原文整理 · 顺为凡，逆则仙，只在心中一念间</p>
+  </header>
+
+  <!-- 第一步 -->
+  <section class="step-card s1">
+    <div class="step-head">
+      <span class="step-badge">STEP 01</span>
+      <span class="step-title">修真第一步 · 修真界</span>
+      <span class="step-desc">凡人踏入仙途的基础阶段</span>
+    </div>
+    <div class="realm-list">
+      <div class="realm"><span class="no">1</span><span class="name">凝气期<small>分十五层，须修至三层方得后续心法</small></span><span class="tag">吐纳天地灵气，改变凡人体制</span></div>
+      <div class="realm"><span class="no">2</span><span class="name">筑基期<small>筑就修真根基</small></span><span class="tag">需灵气 + 机缘 + 悟性，缺一不可</span></div>
+      <div class="realm"><span class="no">3</span><span class="name">结丹期<small>凝结金丹</small></span><span class="tag">至此方可对凡人使用搜魂术</span></div>
+      <div class="realm"><span class="no">4</span><span class="name">元婴期<small>元婴出窍</small></span><span class="tag">三级修真国所能达到的巅峰</span></div>
+      <div class="realm"><span class="no">5</span><span class="name">化神期<small>神识通玄</small></span><span class="tag">三级国之"传说"境界，可晋升四级国</span></div>
+      <div class="realm"><span class="no">6</span><span class="name">婴变期<small>元婴蜕变</small></span><span class="tag">出现一人即可晋升五级修真国</span></div>
+      <div class="realm"><span class="no">7</span><span class="name">问鼎期<small>有"生死一关"，须悟阴阳二意</small></span><span class="tag">问鼎老怪极为罕见</span></div>
+      <div class="realm"><span class="no">8</span><span class="name">窥涅期<small>阴意圆满、阳意洗涤方可冲击</small></span><span class="tag">初窥涅槃之境</span></div>
+      <div class="realm"><span class="no">9</span><span class="name">净涅期<small>涅槃清净</small></span><span class="tag">气息已极其可怕</span></div>
+      <div class="realm"><span class="no">10</span><span class="name">碎涅期<small>第一步之巅，碎涅大圆满</small></span><span class="tag">方可用仙宝之上的至宝</span></div>
+    </div>
+    <div class="quote">原文："你们三级修真国，境界只有<b>凝气、筑基、结丹、元婴</b>四个，至于<b>化神期</b>，在你们眼里，那是传说中的境界。一旦三级修真国出现了一个化神期的人物，那么便会提高等级，达到四级修真国……若出了一个<b>婴变期</b>人物，就会晋升五级修真国。"</div>
+  </section>
+
+  <!-- 过渡 -->
+  <section class="step-card trans">
+    <div class="step-head">
+      <span class="step-badge">过渡</span>
+      <span class="step-title">半步入道</span>
+      <span class="step-desc">介于第一步与第二步之间</span>
+    </div>
+    <div class="realm-list">
+      <div class="realm"><span class="no">—</span><span class="name">半步入道<small>碎涅之后的门槛</small></span><span class="tag">一只脚踏入"道"的门槛</span></div>
+    </div>
+  </section>
+
+  <!-- 第二步 -->
+  <section class="step-card s2">
+    <div class="step-head">
+      <span class="step-badge">STEP 02</span>
+      <span class="step-title">修真第二步 · 仙界</span>
+      <span class="step-desc">以"本源"为核心</span>
+    </div>
+    <div class="realm-list">
+      <div class="realm"><span class="no">1</span><span class="name">入道境<small>感悟本源、凝聚本源真身</small></span><span class="tag">一道本源大成 → 可成第三步大能</span></div>
+      <div class="realm"><span class="no">2</span><span class="name">空劫<small>第二步高阶</small></span><span class="tag">体内元力通天，引动真正天劫</span></div>
+      <div class="realm"><span class="no">3</span><span class="name">空劫大圆满<small>第二步之巅</small></span><span class="tag">距大天尊仅半步，称"半步踏天"</span></div>
+    </div>
+    <div class="quote">原文："一道<b>本源大成</b>就可成为第三步大能，两道本源极为罕见……方为两道本源大成入道，<b>踏进第三步之境</b>！"</div>
+  </section>
+
+  <!-- 第三步 -->
+  <section class="step-card s3">
+    <div class="step-head">
+      <span class="step-badge">STEP 03</span>
+      <span class="step-title">修真第三步 · 仙罡大陆</span>
+      <span class="step-desc">至高无上的境界层次</span>
+    </div>
+    <div class="realm-list">
+      <div class="realm"><span class="no">1</span><span class="name">大天尊<small>仙罡九阳 / 九大天尊 = 九座天宫</small></span><span class="tag">仙族之地有五位：八极、久帝、双子、道一、武封</span></div>
+      <div class="realm"><span class="no">2</span><span class="name">踏天境<small>"披星斩月，低头踏天"</small></span><span class="tag">半只脚迈入，可施展近乎仙祖之力</span></div>
+      <div class="realm"><span class="no">3</span><span class="name">真神 / 仙祖 · 古祖<small>第四步？（大天尊之上的终极层次）</small></span><span class="tag">三大本源真身归一 → 唯一真身 → 真神</span></div>
+    </div>
+    <div class="quote">原文："仙罡大陆的九个太阳，是九座天宫，代表了九个至高无上的<b>大天尊</b>……九是极限，若出现第十个太阳，则仙罡将起无量量劫。"<br>原文："大天尊之上，必定还有一个层次……需要我<b>三大本源真身归一</b>后凝聚出的唯一真身，达到<b>真神</b>的程度！"</div>
+  </section>
+
+  <!-- 辅助体系 -->
+  <div class="grid2">
+    <div class="sub-card s1">
+      <h3>修真国等级 ↔ 境界</h3>
+      <table>
+        <tr><th>修真国等级</th><th>对应境界</th></tr>
+        <tr><td>一 ~ 二级</td><td>凝气 ~ 筑基</td></tr>
+        <tr><td>三级</td><td>凝气、筑基、结丹、<b>元婴</b></td></tr>
+        <tr><td>四级</td><td>出现 <b>化神期</b></td></tr>
+        <tr><td>五级</td><td>出现 <b>婴变期</b></td></tr>
+        <tr><td>六级</td><td>拥有一个星球</td></tr>
+        <tr><td>七级 / 八阶宗派</td><td>星空星域级别</td></tr>
+      </table>
+    </div>
+    <div class="sub-card s2">
+      <h3>顺修与逆修</h3>
+      <ul>
+        <li><b>顺修</b>：<em>循天道而修</em>，融合天地元气与元神，问鼎时引动常规变化</li>
+        <li><b>逆修</b>：<em>逆天而行</em>，引动"真正的天劫"——天道之惩罚，不受界域破碎影响</li>
+        <li>王林为<b>逆修者</b>，以生死轮回意境蜕变，"披星斩月，低头踏天"</li>
+        <li>意境两次蜕变：<b>法术 → 道术 → 信术</b>（对应意境 / 本源 / 信念）</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sub-card" style="margin-top:28px">
+    <h3>本源体系（入道境核心）</h3>
+    <ul style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px 30px">
+      <li><b>因果本源</b>：王林所修三大本源之一</li>
+      <li><b>生死本源</b>：生死轮回意境凝聚</li>
+      <li><b>真假本源</b>：辨真假虚实</li>
+      <li>另含 <em>雷、火、土</em> 等五行本源，可融合为"天地五行分身"</li>
+      <li>本源 → <b>本源真身</b>（多个）→ 三大本源真身<b>归一</b> → 唯一真身</li>
+      <li>两道本源大成者罕见：<em>掌尊、青霖仙帝</em></li>
+    </ul>
+  </div>
+
+  <footer>
+    《仙逆》· 耳根 著 ｜ 境界体系依据原文关键词检索整理 · 仅作修真图谱参考
+  </footer>
+
+</div>
+</body>
+</html>
