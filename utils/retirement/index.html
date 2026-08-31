@@ -578,38 +578,102 @@
     /* 模态框底部按钮 */
     .modal__actions {
       display: flex;
+      justify-content: end;
       gap: var(--sp-3);
       margin-top: var(--sp-6);
     }
 
     .modal__actions .btn {
       height: 48px;
+      width: 120px;
       font-size: 14px;
     }
 
-    /* ========== 说明区域 ========== */
+    /* ========== 折叠面板 ========== */
+    .collapse {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      transition: border-color 0.3s var(--ease);
+    }
+
+    .collapse:hover {
+      border-color: var(--border-strong);
+    }
+
+    .collapse__header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--sp-4) var(--sp-5);
+      cursor: pointer;
+      transition: background 0.2s var(--ease);
+    }
+
+    .collapse__header:hover {
+      background: var(--surface-2);
+    }
+
+    .collapse__header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-1);
+    }
+
+    .collapse__header-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .collapse__arrow {
+      width: 20px;
+      height: 20px;
+      color: var(--text-3);
+      transition: transform 0.3s var(--ease);
+      flex-shrink: 0;
+    }
+
+    .collapse.is-open .collapse__arrow {
+      transform: rotate(180deg);
+      color: var(--primary);
+    }
+
+    .collapse__body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s var(--ease);
+    }
+
+    .collapse.is-open .collapse__body {
+      max-height: 500px;
+    }
+
+    .collapse__inner {
+      padding: 0 var(--sp-5) var(--sp-5);
+    }
+
     .notice {
       background: var(--accent-soft);
       border: 1px solid rgba(34, 211, 238, 0.2);
       border-radius: var(--r-md);
       padding: var(--sp-4);
-      margin-top: var(--sp-5);
-    }
-
-    .notice__title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--accent);
-      margin-bottom: var(--sp-2);
-      display: flex;
-      align-items: center;
-      gap: var(--sp-2);
     }
 
     .notice__text {
       font-size: 12px;
       color: var(--text-2);
-      line-height: 1.7;
+      line-height: 1.8;
     }
 
     .notice__text p {
@@ -618,6 +682,11 @@
 
     .notice__text p:last-child {
       margin-bottom: 0;
+    }
+
+    .notice__text strong {
+      color: var(--accent);
+      font-weight: 600;
     }
 
     /* ========== 页脚 ========== */
@@ -758,6 +827,30 @@
         <span>计算退休年龄</span>
       </button>
     </section>
+
+    <!-- 计算说明（折叠面板） -->
+    <section class="collapse" id="calcNoteCollapse" style="margin-top: var(--sp-5);">
+      <button class="collapse__header" id="collapseHeader" type="button">
+        <span class="collapse__header-left">
+          <span class="collapse__header-icon">ℹ</span>
+          计算说明
+        </span>
+        <svg class="collapse__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+      <div class="collapse__body">
+        <div class="collapse__inner">
+          <div class="notice">
+            <div class="notice__text" id="calcNote">
+              <p>计算结果基于<strong>《国务院关于渐进式延迟法定退休年龄的办法》</strong>。</p>
+              <p>请先在上方填写个人信息并点击计算，计算后将在此显示详细的计算说明。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- 结果模态框 -->
@@ -803,17 +896,10 @@
             <div class="result__item-value result__item-value--primary" id="yearsToRetire">—</div>
           </div>
         </div>
-
-        <div class="notice">
-          <div class="notice__title">ℹ 计算说明</div>
-          <div class="notice__text" id="calcNote">
-            <p>计算结果基于《国务院关于渐进式延迟法定退休年龄的办法》。</p>
-          </div>
-        </div>
       </div>
 
       <div class="modal__actions">
-        <button class="btn btn--ghost" data-close>关闭</button>
+        <!-- <button class="btn btn--ghost" data-close>关闭</button> -->
         <button class="btn btn--primary" data-close>知道了</button>
       </div>
     </article>
@@ -879,6 +965,8 @@
         typeSelect: document.getElementById("typeSelect"),
         typeLabel: document.getElementById("typeLabel"),
         calcBtn: document.getElementById("calcBtn"),
+        collapseHeader: document.getElementById("collapseHeader"),
+        calcNoteCollapse: document.getElementById("calcNoteCollapse"),
         resultModal: document.getElementById("resultModal"),
         retirementAge: document.getElementById("retirementAge"),
         retirementDate: document.getElementById("retirementDate"),
@@ -1079,9 +1167,9 @@
 
         // 计算说明
         const noteHtml = `
-        <p>根据《国务院关于渐进式延迟法定退休年龄的办法》，${config.name}原法定退休年龄为${config.originalAge}周岁，逐步延迟至${config.targetAge}周岁。</p>
+        <p>根据<strong>《国务院关于渐进式延迟法定退休年龄的办法》</strong>，${config.name}原法定退休年龄为${config.originalAge}周岁，逐步延迟至${config.targetAge}周岁。</p>
         <p>您出生于${state.birthYear}年${state.birthMonth}月，属渐进式延迟退休第${delayMonths > 0 ? delayMonths : "0"}批，每${config.monthsPerStep}个月延迟1个月。</p>
-        <p>社保最低缴费年限按退休年份计算，2030年起逐年提高。</p>
+        <p>社保最低缴费年限按退休年份计算，2030年起逐年提高，最高不超过20年。</p>
       `;
         els.calcNote.innerHTML = noteHtml;
 
@@ -1139,6 +1227,11 @@
           }
           const result = calculateRetirement();
           renderResult(result);
+        });
+
+        // 折叠面板展开/收起
+        els.collapseHeader.addEventListener("click", () => {
+          els.calcNoteCollapse.classList.toggle("is-open");
         });
 
         // 模态框关闭

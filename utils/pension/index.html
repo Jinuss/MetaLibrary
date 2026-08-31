@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0b14" />
+  <meta name="description" content="退休金估算计算器 - 支持企业城镇职工和城乡居民养老金估算" />
+  <title>退休金计算器</title>
+  <style>
+    /* ========== 设计令牌 ========== */
+    :root {
+      --bg-0: #07070f;
+      --bg-1: #0b0b14;
+      --bg-2: #11111d;
+      --surface: rgba(255, 255, 255, 0.04);
+      --surface-2: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --primary: #8b5cf6;
+      --primary-2: #6366f1;
+      --primary-soft: rgba(139, 92, 246, 0.16);
+      --accent: #22d3ee;
+      --accent-soft: rgba(34, 211, 238, 0.14);
+      --text-1: #f5f5fa;
+      --text-2: #b4b4c7;
+      --text-3: #6f6f87;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --r-sm: 10px;
+      --r-md: 16px;
+      --r-lg: 22px;
+      --r-pill: 999px;
+      --sp-1: 4px;
+      --sp-2: 8px;
+      --sp-3: 12px;
+      --sp-4: 16px;
+      --sp-5: 20px;
+      --sp-6: 24px;
+      --sp-8: 32px;
+      --sp-10: 40px;
+      --nav-h: 64px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --shadow-card: 0 10px 30px -12px rgba(0, 0, 0, .6), 0 2px 6px rgba(0, 0, 0, .4);
+    }
+
+    /* ========== 基础重置 ========== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      font-family: "Inter", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg-0);
+      color: var(--text-1);
+      font-size: 14px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    /* ========== 背景光晕装饰 ========== */
+    .bg-glow {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(60% 50% at 18% -8%, rgba(139, 92, 246, 0.22), transparent 70%),
+        radial-gradient(50% 45% at 92% 4%, rgba(34, 211, 238, 0.14), transparent 70%),
+        radial-gradient(70% 60% at 50% 110%, rgba(99, 102, 241, 0.18), transparent 70%);
+    }
+
+    .bg-glow::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%);
+    }
+
+    /* ========== 容器 ========== */
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0 var(--sp-4);
+    }
+
+    /* ========== 导航栏 ========== */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: var(--nav-h);
+      background: rgba(11, 11, 20, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s var(--ease);
+    }
+
+    .nav__inner {
+      max-width: 640px;
+      height: 100%;
+      margin: 0 auto;
+      padding: 0 var(--sp-4);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+    }
+
+    .nav__logo {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      text-decoration: none;
+      color: var(--text-1);
+    }
+
+    .nav__logo-mark {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border-radius: var(--r-sm);
+      font-size: 16px;
+    }
+
+    .nav__logo-text {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .nav__logo-text em {
+      font-style: normal;
+      color: var(--primary);
+    }
+
+    /* ========== Hero 区 ========== */
+    .hero {
+      padding: var(--sp-6) 0 var(--sp-6);
+      text-align: center;
+    }
+
+    .hero__title {
+      font-size: clamp(28px, 8vw, 44px);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--sp-4);
+      background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero__subtitle {
+      font-size: 14px;
+      color: var(--text-2);
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    /* ========== Tab 切换 ========== */
+    .tabs {
+      display: flex;
+      gap: var(--sp-1);
+      padding: var(--sp-1);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      margin-bottom: var(--sp-5);
+    }
+
+    .tab {
+      flex: 1;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--r-sm);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-2);
+      transition: all 0.25s var(--ease);
+      white-space: nowrap;
+    }
+
+    .tab.is-active {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    /* ========== 卡片 ========== */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: var(--sp-6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-card);
+      transition: border-color 0.3s var(--ease);
+    }
+
+    .card+.card {
+      margin-top: var(--sp-5);
+    }
+
+    .card__title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: var(--sp-5);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+
+    .card__title::before {
+      content: "";
+      width: 3px;
+      height: 16px;
+      background: linear-gradient(180deg, var(--primary), var(--accent));
+      border-radius: 2px;
+    }
+
+    /* ========== 表单 ========== */
+    .form-group {
+      margin-bottom: var(--sp-5);
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-2);
+      margin-bottom: var(--sp-2);
+      font-weight: 500;
+    }
+
+    .form-label .hint {
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 400;
+      margin-left: var(--sp-2);
+    }
+
+    .form-row {
+      display: flex;
+      gap: var(--sp-3);
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      height: 48px;
+      padding: 0 var(--sp-4);
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      color: var(--text-1);
+      font-size: 15px;
+      transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .input:focus,
+    .select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(139, 92, 246, 0.06);
+    }
+
+    .input::placeholder {
+      color: var(--text-3);
+    }
+
+    .select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b4b4c7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      padding-right: 40px;
+      cursor: pointer;
+      color: var(--text-1);
+    }
+
+    .select:invalid {
+      color: var(--text-3);
+    }
+
+    .select option {
+      color: var(--text-1);
+      background: var(--bg-2);
+    }
+
+    .select option:first-child {
+      color: var(--text-3);
+    }
+
+    /* 带后缀的输入框 */
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper .input {
+      padding-right: 48px;
+    }
+
+    .input-suffix {
+      position: absolute;
+      right: var(--sp-4);
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 13px;
+      color: var(--text-3);
+      pointer-events: none;
+    }
+
+    /* 滑块 */
+    .slider-wrap {
+      padding: var(--sp-2) 0;
+    }
+
+    .slider {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--bg-2);
+      border-radius: var(--r-pill);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+      transition: transform 0.2s var(--ease);
+    }
+
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    .slider::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: var(--sp-2);
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    .slider-value {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-1);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* 复选开关 */
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--sp-3) 0;
+    }
+
+    .switch-row .form-label {
+      margin-bottom: 0;
+    }
+
+    .switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      border-radius: var(--r-pill);
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.25s var(--ease);
+      flex-shrink: 0;
+    }
+
+    .switch::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--text-3);
+      transition: all 0.25s var(--ease);
+    }
+
+    .switch.is-on {
+      background: var(--primary-soft);
+      border-color: var(--primary);
+    }
+
+    .switch.is-on::after {
+      left: 22px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    }
+
+    /* ========== 按钮 ========== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+      height: 52px;
+      padding: 0 var(--sp-6);
+      border-radius: var(--r-md);
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.2s var(--ease);
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .btn--primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn--primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 32px rgba(139, 92, 246, 0.4);
+    }
+
+    .btn--primary:active {
+      transform: translateY(0);
+    }
+
+    .btn--ghost {
+      background: var(--surface);
+      color: var(--text-1);
+      border: 1px solid var(--border);
+    }
+
+    .btn--ghost:hover {
+      background: var(--surface-2);
+      border-color: var(--border-strong);
+    }
+
+    /* ========== 信息提示 ========== */
+    .info-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-1);
+      padding: 2px var(--sp-2);
+      background: var(--accent-soft);
+      border: 1px solid rgba(34, 211, 238, 0.2);
+      border-radius: var(--r-sm);
+      font-size: 11px;
+      color: var(--accent);
+      margin-top: var(--sp-2);
+    }
+
+    /* ========== 模态框 ========== */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--sp-4);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s var(--ease), visibility 0.3s var(--ease);
+    }
+
+    .modal.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal__overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .modal__card {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: var(--bg-1);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--r-lg);
+      padding: var(--sp-6);
+      box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .75), 0 0 0 1px var(--border);
+      transform: scale(0.96) translateY(12px);
+      transition: transform 0.35s var(--ease);
+    }
+
+    .modal.is-open .modal__card {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal__close {
+      position: absolute;
+      top: var(--sp-4);
+      right: var(--sp-4);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--r-md);
+      color: var(--text-2);
+      font-size: 18px;
+      transition: all 0.2s var(--ease);
+      z-index: 1;
+    }
+
+    .modal__close:hover {
+      background: var(--surface-2);
+      color: var(--text-1);
+    }
+
+    .modal__title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: var(--sp-5);
+      text-align: center;
+      padding-right: var(--sp-8);
+    }
+
+    /* 结果展示 */
+    .result__header {
+      text-align: center;
+      padding-bottom: var(--sp-5);
+      margin-bottom: var(--sp-5);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .result__amount-label {
+      font-size: 13px;
+      color: var(--text-2);
+      margin-bottom: var(--sp-2);
+    }
+
+    .result__amount {
+      font-size: clamp(32px, 10vw, 48px);
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--primary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .result__amount-unit {
+      font-size: 0.45em;
+      font-weight: 600;
+      color: var(--text-2);
+      -webkit-text-fill-color: var(--text-2);
+    }
+
+    .result__annual {
+      font-size: 13px;
+      color: var(--text-3);
+      margin-top: var(--sp-2);
+    }
+
+    .result__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--sp-3);
+    }
+
+    .result__item {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: var(--sp-4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .result__item-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .result__item-label {
+      font-size: 12px;
+      color: var(--text-3);
+    }
+
+    .result__item-formula {
+      font-size: 10px;
+      color: var(--text-3);
+      opacity: 0.7;
+    }
+
+    .result__item-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+
+    .result__item-value--accent {
+      color: var(--accent);
+    }
+
+    .result__item-value--primary {
+      color: var(--primary);
+    }
+
+    .result__item-value--success {
+      color: var(--success);
+    }
+
+    .result__item-value--warning {
+      color: var(--warning);
+    }
+
+    .result__item--full {
+      grid-column: 1 / -1;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--sp-2);
+      border-color: var(--border-strong);
+      background: var(--primary-soft);
+    }
+
+    .agency-card {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-3);
+    }
+
+    .agency-card__icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--r-sm);
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .agency-card__body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .agency-card__name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-1);
+      margin-bottom: 4px;
+    }
+
+    .agency-card__row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-2);
+      margin-top: 2px;
+    }
+
+    .agency-card__row a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .disclaimer {
+      margin-top: var(--sp-4);
+      padding: var(--sp-3) var(--sp-4);
+      background: rgba(248, 113, 113, 0.08);
+      border: 1px solid rgba(248, 113, 113, 0.2);
+      border-radius: var(--r-md);
+      font-size: 11px;
+      color: var(--text-2);
+      line-height: 1.6;
+    }
+
+    .modal__actions {
+      display: flex;
+      justify-content: end;
+      gap: var(--sp-3);
+      margin-top: var(--sp-6);
+    }
+
+    .modal__actions .btn {
+      height: 48px;
+      width: 120px;
+      font-size: 14px;
+    }
+
+    /* ========== 折叠面板 ========== */
+    .collapse {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      transition: border-color 0.3s var(--ease);
+    }
+
+    .collapse:hover {
+      border-color: var(--border-strong);
+    }
+
+    .collapse__header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--sp-4) var(--sp-5);
+      cursor: pointer;
+      transition: background 0.2s var(--ease);
+    }
+
+    .collapse__header:hover {
+      background: var(--surface-2);
+    }
+
+    .collapse__header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-1);
+    }
+
+    .collapse__header-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .collapse__arrow {
+      width: 20px;
+      height: 20px;
+      color: var(--text-3);
+      transition: transform 0.3s var(--ease);
+      flex-shrink: 0;
+    }
+
+    .collapse.is-open .collapse__arrow {
+      transform: rotate(180deg);
+      color: var(--primary);
+    }
+
+    .collapse__body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s var(--ease);
+    }
+
+    .collapse.is-open .collapse__body {
+      max-height: 800px;
+    }
+
+    .collapse__inner {
+      padding: 0 var(--sp-5) var(--sp-5);
+    }
+
+    .notice {
+      background: var(--accent-soft);
+      border: 1px solid rgba(34, 211, 238, 0.2);
+      border-radius: var(--r-md);
+      padding: var(--sp-4);
+    }
+
+    .notice__text {
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.8;
+    }
+
+    .notice__text p {
+      margin-bottom: 6px;
+    }
+
+    .notice__text p:last-child {
+      margin-bottom: 0;
+    }
+
+    .notice__text strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .notice__text code {
+      display: inline-block;
+      background: var(--bg-2);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: var(--primary);
+      font-family: "SF Mono", "Fira Code", monospace;
+    }
+
+    /* ========== 页脚 ========== */
+    .footer {
+      text-align: center;
+      padding: var(--sp-8) 0 var(--sp-6);
+      color: var(--text-3);
+      font-size: 12px;
+    }
+
+    .footer__brand {
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: var(--sp-2);
+    }
+
+    /* ========== 动画 ========== */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-in {
+      animation: fadeInUp 0.6s var(--ease) forwards;
+      opacity: 0;
+    }
+
+    .animate-in--1 {
+      animation-delay: 0.05s;
+    }
+
+    .animate-in--2 {
+      animation-delay: 0.1s;
+    }
+
+    .animate-in--3 {
+      animation-delay: 0.15s;
+    }
+
+    .animate-in--4 {
+      animation-delay: 0.2s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ========== 响应式 ========== */
+    @media (max-width: 480px) {
+      .card {
+        padding: var(--sp-5);
+      }
+
+      .result__item-value {
+        font-size: 16px;
+      }
+
+      .tab {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <div class="nav__logo">
+        <span class="nav__logo-mark">¥</span>
+        <span class="nav__logo-text">退休金<em>计算器</em></span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero animate-in animate-in--1">
+      <h1 class="hero__title">退休金估算计算器</h1>
+      <p class="hero__subtitle">支持企业城镇职工和城乡居民养老保险，根据参保地区与缴费情况估算退休后每月可领取的养老金</p>
+    </section>
+
+    <!-- Tab 切换 -->
+    <div class="tabs animate-in animate-in--2" id="tabs">
+      <button class="tab is-active" data-type="employee">企业城镇职工</button>
+      <button class="tab" data-type="resident">城乡居民</button>
+    </div>
+
+    <!-- 输入表单 -->
+    <section class="card animate-in animate-in--3" id="formCard">
+      <h2 class="card__title" id="formTitle">参保信息</h2>
+
+      <!-- 公共：所在地区 -->
+      <div class="form-group">
+        <label class="form-label">所在省份</label>
+        <select class="select" id="provinceSelect"></select>
+      </div>
+
+      <!-- 城乡居民：地市选择 -->
+      <div class="form-group" id="cityGroup" style="display:none;">
+        <label class="form-label">所在城市 <span class="hint">不同地市标准不同</span></label>
+        <select class="select" id="citySelect"></select>
+      </div>
+
+      <!-- ========== 企业城镇职工表单 ========== -->
+      <div id="employeeForm">
+        <div class="form-group">
+          <label class="form-label">退休年龄 <span class="hint">渐进式延迟后</span></label>
+          <div class="input-wrapper">
+            <input type="number" class="input" id="empRetireAge" value="60" min="45" max="70" step="1" />
+            <span class="input-suffix">周岁</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">累计缴费年限</label>
+          <div class="input-wrapper">
+            <input type="number" class="input" id="empYears" value="30" min="15" max="45" step="1" />
+            <span class="input-suffix">年</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            平均缴费工资指数
+            <span class="hint">历年缴费工资 ÷ 社平工资的均值</span>
+          </label>
+          <div class="slider-wrap">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: var(--sp-2);">
+              <span class="slider-value" id="empIndexValue">0.6</span>
+              <span style="font-size:11px; color:var(--text-3);" id="empIndexDesc">按最低基数缴费</span>
+            </div>
+            <input type="range" class="slider" id="empIndex" min="0.6" max="3.0" step="0.05" value="0.6" />
+            <div class="slider-labels">
+              <span>0.6（下限）</span>
+              <span>1.0（社平）</span>
+              <span>3.0（上限）</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            视同缴费年限 <span class="hint">1996年前工龄，无则填0</span></label>
+          <div class="input-wrapper">
+            <input type="number" class="input" id="empDeemedYears" value="0" min="0" max="25" step="0.5" />
+            <span class="input-suffix">年</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="switch-row">
+            <label class="form-label">
+              个人账户储存额
+              <span class="hint">已知则手动输入</span>
+            </label>
+            <div class="switch is-on" id="empAutoSwitch" data-on="true"></div>
+          </div>
+          <div class="input-wrapper" id="empAccountWrap" style="display:none;">
+            <input type="number" class="input" id="empAccount" value="80000" min="0" step="1000" placeholder="个人账户累计储存额" />
+            <span class="input-suffix">元</span>
+          </div>
+          <div class="info-tag" id="empAutoTag">自动估算：按缴费基数8%逐年缴费并计息</div>
+        </div>
+      </div>
+
+      <!-- ========== 城乡居民表单 ========== -->
+      <div id="residentForm" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">当前年龄 <span class="hint">用于计算高龄倾斜</span></label>
+          <div class="input-wrapper">
+            <input type="number" class="input" id="resAge" value="60" min="45" max="90" step="1" />
+            <span class="input-suffix">周岁</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">年缴费档次</label>
+          <select class="select" id="resTier"></select>
+          <div class="info-tag" id="resSubsidyTag">政府补贴：30 元/年</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">累计缴费年限</label>
+          <div class="input-wrapper">
+            <input type="number" class="input" id="resYears" value="15" min="15" max="45" step="1" />
+            <span class="input-suffix">年</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            个人账户余额
+            <span class="hint">已知请填写，留空则自动估算</span>
+          </label>
+          <div class="input-wrapper">
+            <input type="number" class="input" id="resAccount" value="" min="0" step="500" placeholder="留空则自动估算" />
+            <span class="input-suffix">元</span>
+          </div>
+          <div class="info-tag" id="resAutoTag">自动估算规则：按缴费档次+政府补贴逐年缴费并按6%年利率计息</div>
+        </div>
+      </div>
+
+      <button class="btn btn--primary" id="calcBtn" style="margin-top: var(--sp-5);">
+        <span>计算退休金</span>
+      </button>
+    </section>
+
+    <!-- 计算说明 -->
+    <section class="collapse" id="calcNoteCollapse" style="margin-top: var(--sp-5);">
+      <button class="collapse__header" id="collapseHeader" type="button">
+        <span class="collapse__header-left">
+          <span class="collapse__header-icon">ℹ</span>
+          计算说明
+        </span>
+        <svg class="collapse__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+      <div class="collapse__body">
+        <div class="collapse__inner">
+          <div class="notice">
+            <div class="notice__text" id="calcNote">
+              <p>请先选择参保类型并填写信息，点击计算后此处将显示详细计算过程。</p>
+              <p><strong>企业城镇职工养老金</strong> = 基础养老金 + 个人账户养老金 + 过渡性养老金</p>
+              <p><strong>城乡居民养老金</strong> = 基础养老金 + 个人账户养老金</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 结果模态框 -->
+  <div class="modal" id="resultModal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal__overlay" data-close></div>
+    <article class="modal__card">
+      <button class="modal__close" data-close aria-label="关闭">✕</button>
+      <h2 class="modal__title">估算结果</h2>
+
+      <div class="result">
+        <div class="result__header">
+          <div class="result__amount-label">月养老金估算</div>
+          <div class="result__amount">
+            <span id="monthlyPension">—</span>
+            <span class="result__amount-unit"> 元/月</span>
+          </div>
+          <div class="result__annual" id="annualPension">—</div>
+        </div>
+
+        <div class="result__grid" id="resultBreakdown">
+          <!-- 动态填充 -->
+        </div>
+      </div>
+
+      <div class="modal__actions">
+        <button class="btn btn--primary" data-close>知道了</button>
+      </div>
+    </article>
+  </div>
+
+  <footer class="footer">
+    <p class="footer__brand">¥ 退休金估算计算器</p>
+    <p>数据来源：人社部、各省人社厅公开数据（2024-2025年度）</p>
+    <p style="margin-top: 6px; color: var(--warning); font-size: 11px;">
+      ⚠ 免责声明：本工具所有估算结果仅供参考，不构成任何行政或法律依据。实际养老金待遇以当地社会保险经办机构核定为准。如有疑问，请拨打全国人社服务热线 <strong>12333</strong> 或联系当地人社部门。
+    </p>
+    <p style="margin-top: 4px; color: var(--text-3);">© <span id="year"></span> 退休金估算计算器</p>
+  </footer>
+
+  <script src="./data.js"></script>
+  <script>
+    (function () {
+      "use strict";
+
+      const DATA = window.PENSION_DATA;
+
+      // ========== 状态 ==========
+      const state = {
+        type: "employee",
+        province: "beijing",
+        city: "beijing",
+        // employee
+        empRetireAge: 60,
+        empYears: 30,
+        empIndex: 0.6,
+        empDeemedYears: 0,
+        empAutoAccount: true,
+        empAccount: 80000,
+        // resident
+        resAge: 60,
+        resTierAmount: 500,
+        resYears: 15,
+        resAccount: 0
+      };
+
+      // ========== DOM 元素 ==========
+      const els = {
+        tabs: document.getElementById("tabs"),
+        provinceSelect: document.getElementById("provinceSelect"),
+        cityGroup: document.getElementById("cityGroup"),
+        citySelect: document.getElementById("citySelect"),
+        employeeForm: document.getElementById("employeeForm"),
+        residentForm: document.getElementById("residentForm"),
+        // employee
+        empRetireAge: document.getElementById("empRetireAge"),
+        empYears: document.getElementById("empYears"),
+        empIndex: document.getElementById("empIndex"),
+        empIndexValue: document.getElementById("empIndexValue"),
+        empIndexDesc: document.getElementById("empIndexDesc"),
+        empDeemedYears: document.getElementById("empDeemedYears"),
+        empAutoSwitch: document.getElementById("empAutoSwitch"),
+        empAccountWrap: document.getElementById("empAccountWrap"),
+        empAccount: document.getElementById("empAccount"),
+        empAutoTag: document.getElementById("empAutoTag"),
+        // resident
+        resAge: document.getElementById("resAge"),
+        resTier: document.getElementById("resTier"),
+        resSubsidyTag: document.getElementById("resSubsidyTag"),
+        resYears: document.getElementById("resYears"),
+        resAccount: document.getElementById("resAccount"),
+        resAutoTag: document.getElementById("resAutoTag"),
+        // common
+        calcBtn: document.getElementById("calcBtn"),
+        collapseHeader: document.getElementById("collapseHeader"),
+        calcNoteCollapse: document.getElementById("calcNoteCollapse"),
+        resultModal: document.getElementById("resultModal"),
+        monthlyPension: document.getElementById("monthlyPension"),
+        annualPension: document.getElementById("annualPension"),
+        resultBreakdown: document.getElementById("resultBreakdown"),
+        calcNote: document.getElementById("calcNote"),
+        year: document.getElementById("year")
+      };
+
+      // ========== 指数描述 ==========
+      function getIndexDesc(v) {
+        if (v <= 0.65) return "按最低基数缴费";
+        if (v <= 0.85) return "低于社平工资";
+        if (v <= 1.05) return "按社平工资缴费";
+        if (v <= 1.5) return "略高于社平工资";
+        if (v <= 2.0) return "较高工资水平";
+        if (v <= 2.5) return "高工资水平";
+        return "按最高基数缴费";
+      }
+
+      // ========== 获取当前省份的数据（城乡居民）==========
+      function getResidentProvince() {
+        return DATA.resident.provinces.find(p => p.code === state.province);
+      }
+
+      // ========== 获取省份的缴费档次（省级优先，否则用默认）==========
+      function getResidentTiers() {
+        const prov = getResidentProvince();
+        if (prov && prov.paymentTiers) return prov.paymentTiers;
+        return DATA.resident.defaultPaymentTiers;
+      }
+
+      // ========== 初始化省份下拉 ==========
+      function initProvinceSelect() {
+        const provinces = state.type === "employee"
+          ? DATA.employee.provinces
+          : DATA.resident.provinces;
+
+        if (!provinces.find(p => p.code === state.province)) {
+          state.province = provinces[0].code;
+        }
+
+        els.provinceSelect.innerHTML = "";
+        provinces.forEach(p => {
+          const opt = document.createElement("option");
+          opt.value = p.code;
+          opt.textContent = p.name;
+          if (p.code === state.province) opt.selected = true;
+          els.provinceSelect.appendChild(opt);
+        });
+
+        // 城乡居民模式：初始化地市选择
+        if (state.type === "resident") {
+          initCitySelect();
+        }
+      }
+
+      // ========== 初始化地市下拉（城乡居民）==========
+      function initCitySelect() {
+        const prov = getResidentProvince();
+        if (!prov || !prov.cities || prov.cities.length <= 1) {
+          els.cityGroup.style.display = "none";
+          state.city = prov ? prov.cities[0].code : "";
+          return;
+        }
+
+        els.cityGroup.style.display = "";
+        if (!prov.cities.find(c => c.code === state.city)) {
+          state.city = prov.cities[0].code;
+        }
+
+        els.citySelect.innerHTML = "";
+        prov.cities.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c.code;
+          opt.textContent = `${c.name}（${c.base} 元/月）`;
+          if (c.code === state.city) opt.selected = true;
+          els.citySelect.appendChild(opt);
+        });
+      }
+
+      // ========== 初始化缴费档次 ==========
+      function initResidentTiers() {
+        const tiers = getResidentTiers();
+        els.resTier.innerHTML = "";
+        tiers.forEach((t) => {
+          const opt = document.createElement("option");
+          opt.value = t.amount;
+          opt.textContent = `${t.amount} 元/年（补贴 ${t.subsidy} 元）`;
+          if (t.amount === state.resTierAmount) opt.selected = true;
+          els.resTier.appendChild(opt);
+        });
+
+        // 如果当前选中的档次不在列表中，选第一个
+        if (!tiers.find(t => t.amount === state.resTierAmount)) {
+          state.resTierAmount = tiers[0].amount;
+          els.resTier.value = state.resTierAmount;
+        }
+        updateSubsidyTag();
+      }
+
+      function updateSubsidyTag() {
+        const tiers = getResidentTiers();
+        const tier = tiers.find(t => t.amount === parseInt(els.resTier.value, 10));
+        if (tier) {
+          els.resSubsidyTag.textContent = `政府补贴：${tier.subsidy} 元/年`;
+          state.resTierAmount = tier.amount;
+        }
+      }
+
+      // ========== Tab 切换 ==========
+      function switchType(type) {
+        state.type = type;
+        els.tabs.querySelectorAll(".tab").forEach(t => {
+          t.classList.toggle("is-active", t.dataset.type === type);
+        });
+
+        if (type === "employee") {
+          els.employeeForm.style.display = "";
+          els.residentForm.style.display = "none";
+          els.cityGroup.style.display = "none";
+        } else {
+          els.employeeForm.style.display = "none";
+          els.residentForm.style.display = "";
+        }
+
+        initProvinceSelect();
+        if (type === "resident") {
+          initResidentTiers();
+        }
+      }
+
+      // ========== 个人账户自动估算开关 ==========
+      function toggleEmpAuto() {
+        state.empAutoAccount = !state.empAutoAccount;
+        els.empAutoSwitch.classList.toggle("is-on", state.empAutoAccount);
+        els.empAutoSwitch.dataset.on = state.empAutoAccount;
+        els.empAccountWrap.style.display = state.empAutoAccount ? "none" : "";
+        els.empAutoTag.style.display = state.empAutoAccount ? "" : "none";
+      }
+
+      // ========== 个人账户储存额估算（年金终值公式）==========
+      // FV = PMT × [(1 + r)^n - 1] / r
+      function estimatePersonalAccount(annualPayment, years, rate) {
+        const r = rate || 0.06;
+        if (r === 0) return annualPayment * years;
+        return annualPayment * (Math.pow(1 + r, years) - 1) / r;
+      }
+
+      // ========== 企业城镇职工养老金计算 ==========
+      function calculateEmployee() {
+        const province = DATA.employee.provinces.find(p => p.code === state.province);
+        if (!province) return null;
+
+        const retireAge = parseInt(state.empRetireAge, 10);
+        const totalYears = parseFloat(state.empYears);
+        const index = parseFloat(state.empIndex);
+        const deemedYears = parseFloat(state.empDeemedYears);
+        const actualYears = Math.max(0, totalYears - deemedYears);
+
+        // 计发月数
+        const pensionMonths = DATA.employee.pensionMonths[retireAge] || 139;
+
+        // 个人账户储存额
+        let accountBalance;
+        if (state.empAutoAccount) {
+          // 月缴费基数 = 计发基数 × 缴费指数（简化：用退休时基数近似）
+          // 年个人缴费 = 月缴费基数 × 8% × 12
+          const monthlyBase = province.base * index;
+          const annualContribution = monthlyBase * 0.08 * 12;
+          accountBalance = estimatePersonalAccount(annualContribution, actualYears, 0.06);
+        } else {
+          accountBalance = parseFloat(state.empAccount) || 0;
+        }
+
+        // 基础养老金 = 计发基数 × (1 + 缴费指数) ÷ 2 × 缴费年限 × 1%
+        const basePension = province.base * (1 + index) / 2 * totalYears * 0.01;
+
+        // 个人账户养老金 = 个人账户储存额 ÷ 计发月数
+        const accountPension = accountBalance / pensionMonths;
+
+        // 过渡性养老金 = 计发基数 × 缴费指数 × 视同缴费年限 × 1.3%
+        const transitionalPension = deemedYears > 0
+          ? province.base * index * deemedYears * DATA.employee.transitionalRate
+          : 0;
+
+        const totalMonthly = basePension + accountPension + transitionalPension;
+
+        return {
+          province,
+          retireAge,
+          totalYears,
+          index,
+          deemedYears,
+          actualYears,
+          pensionMonths,
+          accountBalance,
+          basePension,
+          accountPension,
+          transitionalPension,
+          totalMonthly
+        };
+      }
+
+      // ========== 城乡居民养老金计算 ==========
+      function calculateResident() {
+        const province = getResidentProvince();
+        if (!province) return null;
+
+        // 获取地市级基础养老金
+        let cityBase = province.base;
+        let cityName = province.name;
+        if (province.cities && province.cities.length > 0) {
+          const city = province.cities.find(c => c.code === state.city) || province.cities[0];
+          cityBase = city.base;
+          cityName = city.name;
+        }
+
+        const years = parseInt(state.resYears, 10);
+        const age = parseInt(state.resAge, 10);
+        const tiers = getResidentTiers();
+        const tier = tiers.find(t => t.amount === state.resTierAmount) || tiers[0];
+        const pensionMonths = DATA.resident.pensionMonths;
+
+        // 个人账户储存额：用户输入了值（>0）则用手动值，否则自动估算
+        const manualAccount = parseFloat(state.resAccount) || 0;
+        const isAutoEstimate = manualAccount <= 0;
+        let accountBalance;
+        if (isAutoEstimate) {
+          const annualPayment = tier.amount + tier.subsidy;
+          accountBalance = estimatePersonalAccount(annualPayment, years, 0.06);
+        } else {
+          accountBalance = manualAccount;
+        }
+
+        // 基础养老金 = 地市级基础养老金标准
+        let basePension = cityBase;
+
+        // 长缴奖励（缴费超过15年）
+        let longPayBonus = 0;
+        let longPayDesc = "";
+        if (years > 15 && province.longPayReward) {
+          const extraYears = years - 15;
+          if (province.longPayReward.type === "percent") {
+            longPayBonus = Math.round(cityBase * province.longPayReward.rate * extraYears);
+            longPayDesc = `每年增发基础养老金的${(province.longPayReward.rate * 100)}%，共${extraYears}年`;
+          } else if (province.longPayReward.type === "fixed") {
+            longPayBonus = province.longPayReward.amount * extraYears;
+            longPayDesc = `每超1年增发${province.longPayReward.amount}元，共${extraYears}年`;
+          }
+          basePension += longPayBonus;
+        }
+
+        // 高龄倾斜
+        let ageBonus = 0;
+        let ageBonusDesc = "";
+        if (province.ageAdjust) {
+          for (const adj of province.ageAdjust) {
+            if (age >= adj.minAge) {
+              ageBonus = adj.amount;
+              ageBonusDesc = `${adj.minAge}周岁以上加发${adj.amount}元`;
+            }
+          }
+          basePension += ageBonus;
+        }
+
+        // 个人账户养老金 = 个人账户储存额 ÷ 139
+        const accountPension = accountBalance / pensionMonths;
+
+        const totalMonthly = basePension + accountPension;
+
+        return {
+          province,
+          cityName,
+          cityBase,
+          years,
+          age,
+          tier,
+          pensionMonths,
+          accountBalance,
+          isAutoEstimate,
+          basePension,
+          accountPension,
+          longPayBonus,
+          longPayDesc,
+          ageBonus,
+          ageBonusDesc,
+          totalMonthly
+        };
+      }
+
+      // ========== 获取当地人社部门联系方式 ==========
+      function getAgencyInfo(provinceCode, cityCode) {
+        if (cityCode && DATA.agencies[cityCode]) return DATA.agencies[cityCode];
+        if (DATA.agencies[provinceCode]) return DATA.agencies[provinceCode];
+        return DATA.defaultAgency;
+      }
+
+      // ========== 构建人社部门联系方式卡片 ==========
+      function buildAgencyCard(provinceCode, cityCode) {
+        const agency = getAgencyInfo(provinceCode, cityCode);
+        const div = document.createElement("div");
+        div.className = "result__item result__item--full";
+        const phoneDigits = agency.phone.replace(/[^0-9\-]/g, "");
+        div.innerHTML = `
+          <div class="result__item-label">当地人社部门</div>
+          <div class="agency-card">
+            <div class="agency-card__icon">📞</div>
+            <div class="agency-card__body">
+              <div class="agency-card__name">${agency.name}</div>
+              <div class="agency-card__row">
+                <span>电话：</span>
+                <a href="tel:${phoneDigits}">${agency.phone}</a>
+              </div>
+              <div class="agency-card__row">
+                <span>地址：</span>
+                <span>${agency.address}</span>
+              </div>
+            </div>
+          </div>
+        `;
+        return div;
+      }
+
+      // ========== 渲染结果 ==========
+      function renderResult(result, type) {
+        els.resultBreakdown.innerHTML = "";
+
+        if (type === "employee") {
+          // 月养老金
+          els.monthlyPension.textContent = result.totalMonthly.toFixed(0);
+
+          // 年养老金
+          els.annualPension.textContent = `约 ${(result.totalMonthly * 12).toFixed(0)} 元/年`;
+
+          // 明细
+          const items = [
+            {
+              label: "基础养老金",
+              formula: `${result.province.base} × (1 + ${result.index.toFixed(2)}) ÷ 2 × ${result.totalYears} × 1%`,
+              value: result.basePension,
+              color: "accent"
+            },
+            {
+              label: "个人账户养老金",
+              formula: `${Math.round(result.accountBalance)} ÷ ${result.pensionMonths}（${result.retireAge}岁计发月数）`,
+              value: result.accountPension,
+              color: "primary"
+            }
+          ];
+
+          if (result.transitionalPension > 0) {
+            items.push({
+              label: "过渡性养老金",
+              formula: `${result.province.base} × ${result.index.toFixed(2)} × ${result.deemedYears} × 1.3%`,
+              value: result.transitionalPension,
+              color: "warning"
+            });
+          }
+
+          items.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "result__item";
+            div.innerHTML = `
+              <div class="result__item-left">
+                <div class="result__item-label">${item.label}</div>
+                <div class="result__item-formula">${item.formula}</div>
+              </div>
+              <div class="result__item-value result__item-value--${item.color}">${item.value.toFixed(2)} 元</div>
+            `;
+            els.resultBreakdown.appendChild(div);
+          });
+
+          // 额外信息
+          const extraDiv = document.createElement("div");
+          extraDiv.className = "result__item";
+          extraDiv.innerHTML = `
+            <div class="result__item-left">
+              <div class="result__item-label">个人账户储存额${state.empAutoAccount ? "（估算）" : ""}</div>
+              <div class="result__item-formula">${state.empAutoAccount ? `按基数×8%×12年缴，6%计息` : `手动输入`}</div>
+            </div>
+            <div class="result__item-value">${Math.round(result.accountBalance)} 元</div>
+          `;
+          els.resultBreakdown.appendChild(extraDiv);
+
+          // 替代率
+          const replacementRate = (result.totalMonthly / (result.province.base * result.index) * 100).toFixed(1);
+          const rateDiv = document.createElement("div");
+          rateDiv.className = "result__item";
+          rateDiv.innerHTML = `
+            <div class="result__item-left">
+              <div class="result__item-label">养老金替代率</div>
+              <div class="result__item-formula">月养老金 ÷ 退休前月工资</div>
+            </div>
+            <div class="result__item-value result__item-value--success">${replacementRate}%</div>
+          `;
+          els.resultBreakdown.appendChild(rateDiv);
+
+          // 计算说明
+          const noteHtml = `
+            <p><strong>企业城镇职工养老金</strong>由三部分组成：</p>
+            <p>① <strong>基础养老金</strong> = 计发基数 × (1 + 缴费指数) ÷ 2 × 缴费年限 × 1%</p>
+            <p>② <strong>个人账户养老金</strong> = 个人账户储存额 ÷ 计发月数</p>
+            ${result.deemedYears > 0 ? "<p>③ <strong>过渡性养老金</strong> = 计发基数 × 缴费指数 × 视同缴费年限 × 1.3%</p>" : ""}
+            <p style="margin-top:8px;">您所在地区 <strong>${result.province.name}</strong>，2024年养老金计发基数为 <code>${result.province.base}</code> 元/月。</p>
+            <p>退休年龄 ${result.retireAge} 岁，对应计发月数 <code>${result.pensionMonths}</code> 个月（国发〔2005〕38号）。</p>
+            <p>缴费指数 ${result.index.toFixed(2)}，累计缴费 ${result.totalYears} 年${result.deemedYears > 0 ? `（含视同缴费 ${result.deemedYears} 年）` : ""}。</p>
+            ${state.empAutoAccount ? `<p>个人账户按自动估算：月缴费基数 ${Math.round(result.province.base * result.index)} × 8% × 12 = 年缴 ${Math.round(result.province.base * result.index * 0.08 * 12)} 元，按6%年利率复利计算 ${result.actualYears} 年，估算储存额约 <code>${Math.round(result.accountBalance)}</code> 元。</p>` : `<p>个人账户储存额为手动输入：<code>${Math.round(result.accountBalance)}</code> 元。</p>`}
+          `;
+          els.calcNote.innerHTML = noteHtml;
+
+        } else {
+          // 城乡居民
+          els.monthlyPension.textContent = result.totalMonthly.toFixed(0);
+          els.annualPension.textContent = `约 ${(result.totalMonthly * 12).toFixed(0)} 元/年`;
+
+          // 基础养老金明细
+          const baseFormula = result.longPayBonus > 0 || result.ageBonus > 0
+            ? `${result.cityName}标准 ${result.cityBase} + 长缴奖励 ${result.longPayBonus}${result.ageBonus > 0 ? ` + 高龄倾斜 ${result.ageBonus}` : ""}`
+            : `${result.cityName}标准`;
+          const items = [
+            {
+              label: "基础养老金",
+              formula: baseFormula,
+              value: result.basePension,
+              color: "accent"
+            },
+            {
+              label: "个人账户养老金",
+              formula: `${Math.round(result.accountBalance)} ÷ ${result.pensionMonths}（60岁计发月数）`,
+              value: result.accountPension,
+              color: "primary"
+            }
+          ];
+
+          // 长缴奖励明细
+          if (result.longPayBonus > 0) {
+            items.push({
+              label: "  ├ 长缴奖励",
+              formula: result.longPayDesc,
+              value: result.longPayBonus,
+              color: "success"
+            });
+          }
+          // 高龄倾斜明细
+          if (result.ageBonus > 0) {
+            items.push({
+              label: "  ├ 高龄倾斜",
+              formula: result.ageBonusDesc,
+              value: result.ageBonus,
+              color: "warning"
+            });
+          }
+
+          items.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "result__item";
+            div.innerHTML = `
+              <div class="result__item-left">
+                <div class="result__item-label">${item.label}</div>
+                <div class="result__item-formula">${item.formula}</div>
+              </div>
+              <div class="result__item-value result__item-value--${item.color}">${item.value.toFixed(2)} 元</div>
+            `;
+            els.resultBreakdown.appendChild(div);
+          });
+
+          // 额外信息
+          const extraDiv = document.createElement("div");
+          extraDiv.className = "result__item";
+          extraDiv.innerHTML = `
+            <div class="result__item-left">
+              <div class="result__item-label">个人账户余额${result.isAutoEstimate ? "（估算）" : ""}</div>
+              <div class="result__item-formula">${result.isAutoEstimate ? `(${result.tier.amount}+${result.tier.subsidy})×${result.years}年，6%计息` : `手动输入`}</div>
+            </div>
+            <div class="result__item-value">${Math.round(result.accountBalance)} 元</div>
+          `;
+          els.resultBreakdown.appendChild(extraDiv);
+
+          // 计算说明
+          let noteHtml = `
+            <p><strong>城乡居民养老金</strong>由两部分组成：</p>
+            <p>① <strong>基础养老金</strong> = 地市标准 + 长缴奖励 + 高龄倾斜</p>
+            <p>② <strong>个人账户养老金</strong> = 个人账户全部储存额 ÷ 139</p>
+            <p style="margin-top:8px;">您所在地区：<strong>${result.province.name} · ${result.cityName}</strong></p>
+            <p>${result.cityName}基础养老金标准为 <code>${result.cityBase}</code> 元/月${result.cityBase > result.province.base ? `（高于省最低${result.province.base}元）` : `（等于省最低标准）`}。</p>
+          `;
+          if (result.longPayBonus > 0) {
+            noteHtml += `<p>长缴奖励：${result.longPayDesc}，每月加发 <code>${result.longPayBonus}</code> 元。</p>`;
+          }
+          if (result.ageBonus > 0) {
+            noteHtml += `<p>高龄倾斜：${result.ageBonusDesc}，每月加发 <code>${result.ageBonus}</code> 元。</p>`;
+          }
+          noteHtml += `
+            <p>缴费档次 ${result.tier.amount} 元/年，政府补贴 ${result.tier.subsidy} 元/年，缴费 ${result.years} 年。</p>
+            ${result.isAutoEstimate ? `<p>个人账户余额未填写，自动估算：年缴 ${(result.tier.amount + result.tier.subsidy)} 元（含补贴），按6%年利率复利计算 ${result.years} 年，估算储存额约 <code>${Math.round(result.accountBalance)}</code> 元。</p>` : `<p>个人账户余额为手动输入：<code>${Math.round(result.accountBalance)}</code> 元。</p>`}
+            <p>60岁退休，计发月数 <code>139</code> 个月（国发〔2014〕8号）。</p>
+          `;
+          els.calcNote.innerHTML = noteHtml;
+        }
+
+        // 当地人社部门联系方式
+        const cityCode = type === "resident" ? state.city : null;
+        els.resultBreakdown.appendChild(
+          buildAgencyCard(state.province, cityCode)
+        );
+
+        // 免责声明
+        const disclaimer = document.createElement("div");
+        disclaimer.className = "disclaimer";
+        disclaimer.innerHTML = "⚠ 以上估算结果仅供参考，实际待遇以当地社保经办机构核定为准。政策咨询请拨打12333或联系上方人社部门。";
+        els.resultBreakdown.appendChild(disclaimer);
+
+        openModal();
+      }
+
+      // ========== 模态框控制 ==========
+      function openModal() {
+        els.resultModal.classList.add("is-open");
+        els.resultModal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeModal() {
+        els.resultModal.classList.remove("is-open");
+        els.resultModal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+
+      // ========== 事件绑定 ==========
+      function bindEvents() {
+        // Tab 切换
+        els.tabs.addEventListener("click", (e) => {
+          const tab = e.target.closest(".tab");
+          if (tab) switchType(tab.dataset.type);
+        });
+
+        // 省份选择
+        els.provinceSelect.addEventListener("change", (e) => {
+          state.province = e.target.value;
+          if (state.type === "resident") {
+            initCitySelect();
+            initResidentTiers();
+          }
+        });
+
+        // 地市选择
+        els.citySelect.addEventListener("change", (e) => {
+          state.city = e.target.value;
+        });
+
+        // --- Employee ---
+        els.empRetireAge.addEventListener("input", (e) => {
+          state.empRetireAge = parseInt(e.target.value, 10) || 60;
+        });
+
+        els.empYears.addEventListener("input", (e) => {
+          state.empYears = parseFloat(e.target.value, 10) || 30;
+        });
+
+        els.empIndex.addEventListener("input", (e) => {
+          state.empIndex = parseFloat(e.target.value);
+          els.empIndexValue.textContent = state.empIndex.toFixed(2);
+          els.empIndexDesc.textContent = getIndexDesc(state.empIndex);
+        });
+
+        els.empDeemedYears.addEventListener("input", (e) => {
+          state.empDeemedYears = parseFloat(e.target.value, 10) || 0;
+        });
+
+        els.empAutoSwitch.addEventListener("click", toggleEmpAuto);
+
+        els.empAccount.addEventListener("input", (e) => {
+          state.empAccount = parseFloat(e.target.value, 10) || 0;
+        });
+
+        // --- Resident ---
+        els.resAge.addEventListener("input", (e) => {
+          state.resAge = parseInt(e.target.value, 10) || 60;
+        });
+
+        els.resTier.addEventListener("change", () => {
+          updateSubsidyTag();
+        });
+
+        els.resYears.addEventListener("input", (e) => {
+          state.resYears = parseInt(e.target.value, 10) || 15;
+        });
+
+        els.resAccount.addEventListener("input", (e) => {
+          state.resAccount = parseFloat(e.target.value, 10) || 0;
+        });
+
+        // 计算按钮
+        els.calcBtn.addEventListener("click", () => {
+          let result;
+          if (state.type === "employee") {
+            // 验证
+            const totalYears = parseFloat(state.empYears);
+            const deemedYears = parseFloat(state.empDeemedYears);
+            if (deemedYears > totalYears) {
+              alert("视同缴费年限不能超过累计缴费年限");
+              return;
+            }
+            result = calculateEmployee();
+            if (!result) return;
+            renderResult(result, "employee");
+          } else {
+            result = calculateResident();
+            if (!result) return;
+            renderResult(result, "resident");
+          }
+        });
+
+        // 折叠面板
+        els.collapseHeader.addEventListener("click", () => {
+          els.calcNoteCollapse.classList.toggle("is-open");
+        });
+
+        // 模态框关闭
+        els.resultModal.addEventListener("click", (e) => {
+          if (e.target.hasAttribute("data-close") || e.target.closest("[data-close]")) {
+            closeModal();
+          }
+        });
+
+        // ESC 关闭
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && els.resultModal.classList.contains("is-open")) {
+            closeModal();
+          }
+        });
+      }
+
+      // ========== 初始化 ==========
+      function init() {
+        els.year.textContent = new Date().getFullYear();
+        initProvinceSelect();
+        els.empIndexValue.textContent = state.empIndex.toFixed(2);
+        els.empIndexDesc.textContent = getIndexDesc(state.empIndex);
+        bindEvents();
+      }
+
+      init();
+    })();
+  </script>
+</body>
+
+</html>
