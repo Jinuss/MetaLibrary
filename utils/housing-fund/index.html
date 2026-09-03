@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0b14" />
+  <meta name="description" content="公积金贷款计算器 - 计算每月公积金缴存额、贷款额度及可贷年限，支持各地不同缴存比例和还款方式" />
+  <title>公积金贷款计算器</title>
+  <style>
+    /* ========== 设计令牌 ========== */
+    :root {
+      --bg-0: #07070f;
+      --bg-1: #0b0b14;
+      --bg-2: #11111d;
+      --surface: rgba(255, 255, 255, 0.04);
+      --surface-2: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --primary: #8b5cf6;
+      --primary-2: #6366f1;
+      --primary-soft: rgba(139, 92, 246, 0.16);
+      --accent: #22d3ee;
+      --accent-soft: rgba(34, 211, 238, 0.14);
+      --text-1: #f5f5fa;
+      --text-2: #b4b4c7;
+      --text-3: #6f6f87;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --r-sm: 10px;
+      --r-md: 16px;
+      --r-lg: 22px;
+      --r-pill: 999px;
+      --sp-1: 4px;
+      --sp-2: 8px;
+      --sp-3: 12px;
+      --sp-4: 16px;
+      --sp-5: 20px;
+      --sp-6: 24px;
+      --sp-8: 32px;
+      --sp-10: 40px;
+      --nav-h: 64px;
+      --maxw: 640px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --shadow-card: 0 10px 30px -12px rgba(0, 0, 0, .6), 0 2px 6px rgba(0, 0, 0, .4);
+      --shadow-pop: 0 30px 80px -20px rgba(0, 0, 0, .75), 0 0 0 1px var(--border);
+    }
+
+    /* ========== 基础重置 ========== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      font-family: "Inter", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg-0);
+      color: var(--text-1);
+      font-size: 14px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    input,
+    select {
+      background: none;
+      border: none;
+      outline: none;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ========== 背景光晕 ========== */
+    .bg-glow {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(60% 50% at 18% -8%, rgba(139, 92, 246, 0.22), transparent 70%),
+        radial-gradient(50% 45% at 92% 4%, rgba(34, 211, 238, 0.14), transparent 70%),
+        radial-gradient(70% 60% at 50% 110%, rgba(99, 102, 241, 0.18), transparent 70%);
+    }
+
+    .bg-glow::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%);
+    }
+
+    /* ========== 导航栏 ========== */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: var(--nav-h);
+      background: rgba(11, 11, 20, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s var(--ease);
+    }
+
+    .nav.scrolled {
+      background: rgba(8, 8, 15, 0.92);
+    }
+
+    .nav__inner {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: 0 var(--sp-4);
+    }
+
+    .nav__logo {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .nav__logo-mark {
+      color: var(--primary);
+      font-size: 18px;
+    }
+
+    .nav__logo-text {
+      letter-spacing: 0.5px;
+    }
+
+    .nav__logo-text em {
+      font-style: normal;
+      font-weight: 400;
+      color: var(--text-2);
+    }
+
+    /* ========== 容器 ========== */
+    .container {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: var(--sp-6) var(--sp-4) var(--sp-10);
+    }
+
+    /* ========== Hero ========== */
+    .hero {
+      text-align: center;
+      padding: var(--sp-8) 0 var(--sp-6);
+    }
+
+    .hero__badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 6px 14px;
+      border-radius: var(--r-pill);
+      margin-bottom: var(--sp-4);
+    }
+
+    .hero__title {
+      font-size: clamp(32px, 8vw, 48px);
+      font-weight: 900;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: var(--sp-3);
+    }
+
+    .hero__subtitle {
+      font-size: clamp(13px, 3.4vw, 15px);
+      color: var(--text-2);
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* ========== 卡片 ========== */
+    .card {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: var(--sp-6);
+      margin-bottom: var(--sp-4);
+      box-shadow: var(--shadow-card);
+    }
+
+    .card__title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-1);
+      margin-bottom: var(--sp-5);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+
+    .card__title::before {
+      content: "";
+      width: 3px;
+      height: 16px;
+      background: linear-gradient(180deg, var(--primary), var(--accent));
+      border-radius: 2px;
+    }
+
+    /* ========== 表单 ========== */
+    .form-group {
+      margin-bottom: var(--sp-4);
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-2);
+      margin-bottom: var(--sp-2);
+    }
+
+    .input-wrap {
+      display: flex;
+      align-items: center;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 0 var(--sp-3);
+      transition: border-color 0.2s var(--ease);
+    }
+
+    .input-wrap:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-soft);
+    }
+
+    .input {
+      flex: 1;
+      width: 100%;
+      padding: 12px 0;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-1);
+      background: transparent;
+      border: none;
+      outline: none;
+    }
+
+    .input::placeholder {
+      color: var(--text-3);
+    }
+
+    .input:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .input-wrap__suffix {
+      font-size: 12px;
+      color: var(--text-3);
+      white-space: nowrap;
+      padding-left: var(--sp-2);
+    }
+
+    .select {
+      width: 100%;
+      padding: 12px var(--sp-3);
+      font-size: 15px;
+      color: var(--text-1);
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236f6f87' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+      transition: border-color 0.2s var(--ease);
+    }
+
+    .select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-soft);
+    }
+
+    .select optgroup {
+      background: var(--bg-1);
+      color: var(--text-3);
+      font-style: normal;
+      font-size: 11px;
+    }
+
+    .select option {
+      background: var(--bg-1);
+      color: var(--text-1);
+      padding: var(--sp-2);
+    }
+
+    /* ========== 单选组 ========== */
+    .radio-group {
+      display: flex;
+      gap: var(--sp-2);
+    }
+
+    .radio-item {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+      padding: 10px var(--sp-3);
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      font-size: 13px;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+    }
+
+    .radio-item input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+    }
+
+    .radio-item:has(input:checked) {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      color: var(--text-1);
+    }
+
+    /* ========== 复选框 ========== */
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-size: 13px;
+      color: var(--text-2);
+      cursor: pointer;
+    }
+
+    .checkbox-item input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+    }
+
+    /* ========== 缴存明细 ========== */
+    .si-detail {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: var(--sp-4);
+      margin-top: var(--sp-4);
+    }
+
+    .si-detail__row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 13px;
+    }
+
+    .si-detail__label {
+      color: var(--text-2);
+    }
+
+    .si-detail__value {
+      color: var(--text-1);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .si-detail__total {
+      border-top: 1px solid var(--border);
+      margin-top: var(--sp-2);
+      padding-top: var(--sp-3);
+    }
+
+    .si-detail__total .si-detail__label {
+      color: var(--text-1);
+      font-weight: 600;
+    }
+
+    .si-detail__total .si-detail__value {
+      color: var(--accent);
+      font-size: 16px;
+    }
+
+    /* ========== 信息提示 ========== */
+    .info-box {
+      background: var(--accent-soft);
+      border: 1px solid rgba(34, 211, 238, 0.2);
+      border-radius: var(--r-md);
+      padding: var(--sp-3) var(--sp-4);
+      margin-top: var(--sp-3);
+    }
+
+    .info-box__text {
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.7;
+    }
+
+    .info-box__text strong {
+      color: var(--accent);
+    }
+
+    /* ========== 按钮 ========== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+      padding: 14px var(--sp-6);
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: var(--r-md);
+      transition: all 0.2s var(--ease);
+    }
+
+    .btn--primary {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff;
+      box-shadow: 0 4px 20px -4px rgba(139, 92, 246, 0.5);
+    }
+
+    .btn--primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px -4px rgba(139, 92, 246, 0.6);
+    }
+
+    .btn--primary:active {
+      transform: translateY(0);
+    }
+
+    .btn--ghost {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-1);
+    }
+
+    .btn--ghost:hover {
+      background: var(--surface-2);
+      border-color: var(--border-strong);
+    }
+
+    /* ========== 可折叠面板 ========== */
+    .card__collapse-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      cursor: pointer;
+      text-align: left;
+      padding: 0;
+      transition: opacity 0.2s var(--ease);
+    }
+
+    .card__collapse-trigger:hover {
+      opacity: 0.9;
+    }
+
+    .card__collapse-summary {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 500;
+      background: var(--accent-soft);
+      padding: 4px 10px;
+      border-radius: var(--r-pill);
+      white-space: nowrap;
+    }
+
+    .card__collapse-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s var(--ease);
+    }
+
+    .card.is-open .card__collapse-body {
+      max-height: 2000px;
+    }
+
+    .card.is-open .collapse__arrow {
+      transform: rotate(180deg);
+      color: var(--primary);
+    }
+
+    .collapse__arrow {
+      width: 20px;
+      height: 20px;
+      color: var(--text-3);
+      transition: transform 0.3s var(--ease);
+      flex-shrink: 0;
+    }
+
+    .card__collapse-inner {
+      padding-top: var(--sp-5);
+    }
+
+    /* ========== 弹窗 ========== */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--sp-4);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s var(--ease), visibility 0.3s var(--ease);
+    }
+
+    .modal.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal__overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(7, 7, 15, 0.8);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .modal__card {
+      position: relative;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-pop);
+      padding: var(--sp-6);
+      transform: scale(0.96) translateY(12px);
+      transition: transform 0.35s var(--ease);
+    }
+
+    .modal.is-open .modal__card {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal__close {
+      position: absolute;
+      top: var(--sp-4);
+      right: var(--sp-4);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--text-3);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-pill);
+      transition: all 0.2s var(--ease);
+      z-index: 2;
+    }
+
+    .modal__close:hover {
+      color: var(--text-1);
+      background: var(--surface-2);
+    }
+
+    .modal__title {
+      font-size: clamp(22px, 5vw, 28px);
+      font-weight: 800;
+      margin-bottom: var(--sp-5);
+      background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      padding-right: var(--sp-8);
+    }
+
+    /* ========== 结果展示 ========== */
+    .result__header {
+      text-align: center;
+      padding: var(--sp-5) 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: var(--sp-5);
+    }
+
+    .result__label {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-bottom: var(--sp-2);
+    }
+
+    .result__value {
+      font-size: clamp(28px, 7vw, 36px);
+      font-weight: 800;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.2;
+    }
+
+    .result__sub {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: var(--sp-2);
+    }
+
+    .result__sub strong {
+      color: var(--text-1);
+      font-weight: 600;
+    }
+
+    .result__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-3);
+      margin-bottom: var(--sp-5);
+    }
+
+    .result__item {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: var(--sp-3) var(--sp-4);
+    }
+
+    .result__item--full {
+      grid-column: 1 / -1;
+    }
+
+    .result__item-label {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-bottom: 4px;
+    }
+
+    .result__item-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-1);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .result__item-value--primary {
+      color: var(--primary);
+    }
+
+    .result__item-value--accent {
+      color: var(--accent);
+    }
+
+    .result__item-value--success {
+      color: var(--success);
+    }
+
+    .result__item-value--warning {
+      color: var(--warning);
+    }
+
+    .result__item-value--danger {
+      color: var(--danger);
+    }
+
+    .result__section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-1);
+      margin-bottom: var(--sp-3);
+      margin-top: var(--sp-5);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+
+    .result__section-title::before {
+      content: "";
+      width: 3px;
+      height: 14px;
+      background: linear-gradient(180deg, var(--primary), var(--accent));
+      border-radius: 2px;
+    }
+
+    /* ========== 还款明细表 ========== */
+    .schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .schedule-table th {
+      text-align: right;
+      padding: 8px 6px;
+      color: var(--text-3);
+      font-weight: 500;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .schedule-table th:first-child {
+      text-align: left;
+    }
+
+    .schedule-table td {
+      text-align: right;
+      padding: 7px 6px;
+      color: var(--text-2);
+      font-variant-numeric: tabular-nums;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .schedule-table td:first-child {
+      text-align: left;
+      color: var(--text-1);
+      font-weight: 500;
+    }
+
+    .schedule-table tr.summary td {
+      color: var(--accent);
+      font-weight: 700;
+      border-bottom: none;
+      border-top: 1px solid var(--border-strong);
+      padding-top: 10px;
+    }
+
+    /* ========== 柱状图 ========== */
+    .chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 120px;
+      padding: var(--sp-2) 0;
+      position: relative;
+    }
+
+    .chart__bar-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .chart__bars {
+      display: flex;
+      gap: 2px;
+      align-items: flex-end;
+      height: 80px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .chart__bar {
+      width: 40%;
+      min-height: 2px;
+      border-radius: 3px 3px 0 0;
+      transition: height 0.5s var(--ease);
+    }
+
+    .chart__bar--principal {
+      background: var(--primary);
+    }
+
+    .chart__bar--interest {
+      background: var(--accent);
+      opacity: 0.6;
+    }
+
+    .chart__month {
+      font-size: 9px;
+      color: var(--text-3);
+    }
+
+    .chart__legend {
+      display: flex;
+      gap: var(--sp-4);
+      justify-content: center;
+      margin-top: var(--sp-2);
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    .chart__legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chart__legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    /* ========== 折叠计算说明 ========== */
+    .collapse {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+    }
+
+    .collapse__header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--sp-4) var(--sp-5);
+      cursor: pointer;
+      transition: background 0.2s var(--ease);
+    }
+
+    .collapse__header:hover {
+      background: var(--surface);
+    }
+
+    .collapse__header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-1);
+    }
+
+    .collapse__header-icon {
+      color: var(--accent);
+      font-size: 16px;
+    }
+
+    .collapse__body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s var(--ease);
+    }
+
+    .collapse.is-open .collapse__body {
+      max-height: 2000px;
+    }
+
+    .collapse.is-open .collapse__arrow {
+      transform: rotate(180deg);
+    }
+
+    .collapse__inner {
+      padding: 0 var(--sp-5) var(--sp-5);
+    }
+
+    .notice {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: var(--sp-3) var(--sp-4);
+      margin-bottom: var(--sp-4);
+    }
+
+    .notice__text p {
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.8;
+    }
+
+    .notice__text strong {
+      color: var(--text-1);
+    }
+
+    .rate-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-bottom: var(--sp-4);
+    }
+
+    .rate-table th {
+      text-align: left;
+      padding: 8px;
+      color: var(--text-3);
+      font-weight: 500;
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .rate-table td {
+      padding: 7px 8px;
+      color: var(--text-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .rate-table td:first-child {
+      color: var(--text-1);
+      font-weight: 500;
+    }
+
+    /* ========== 页脚 ========== */
+    .footer {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: var(--sp-6) var(--sp-4);
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer__disclaimer {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: var(--sp-3) var(--sp-4);
+      margin-bottom: var(--sp-4);
+      text-align: left;
+    }
+
+    .footer__disclaimer-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--warning);
+      margin-bottom: var(--sp-1);
+    }
+
+    .footer__disclaimer-text {
+      font-size: 11px;
+      color: var(--text-3);
+      line-height: 1.7;
+    }
+
+    .footer__brand {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-2);
+      margin-bottom: 4px;
+    }
+
+    .footer p {
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    /* ========== 动画 ========== */
+    .animate-in {
+      opacity: 0;
+      animation: cardIn 0.6s var(--ease) forwards;
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-in--1 {
+      animation-delay: 0s;
+    }
+
+    .animate-in--2 {
+      animation-delay: 0.05s;
+    }
+
+    .animate-in--3 {
+      animation-delay: 0.1s;
+    }
+
+    .animate-in--4 {
+      animation-delay: 0.15s;
+    }
+
+    .animate-in--5 {
+      animation-delay: 0.2s;
+    }
+
+    .animate-in--6 {
+      animation-delay: 0.25s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ========== 响应式 ========== */
+    @media (max-width: 480px) {
+      .card {
+        padding: var(--sp-5);
+      }
+
+      .result__item-value {
+        font-size: 15px;
+      }
+
+      .schedule-table {
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 背景光晕装饰 -->
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- 顶部导航 -->
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a class="nav__logo" href="#top">
+        <span class="nav__logo-mark">✦</span>
+        <span class="nav__logo-text">公积金<em>计算器</em></span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container" id="top">
+    <!-- Hero 区 -->
+    <section class="hero animate-in animate-in--1">
+      <span class="hero__badge">✦ 2025最新利率</span>
+      <h1 class="hero__title">公积金贷款<br />计算器</h1>
+      <p class="hero__subtitle">计算每月公积金缴存额、可贷额度及还款计划，支持各城市不同缴存比例与贷款上限</p>
+    </section>
+
+    <!-- 所在城市 -->
+    <section class="card animate-in animate-in--2">
+      <h2 class="card__title">所在城市</h2>
+      <div class="form-group">
+        <label class="form-label">选择城市</label>
+        <select class="select" id="citySelect">
+          <optgroup label="直辖市">
+            <option value="beijing">北京</option>
+            <option value="shanghai">上海</option>
+            <option value="tianjin">天津</option>
+            <option value="chongqing">重庆</option>
+          </optgroup>
+          <optgroup label="省会/首府城市">
+            <option value="shijiazhuang">石家庄</option>
+            <option value="taiyuan">太原</option>
+            <option value="huhehaote">呼和浩特</option>
+            <option value="shenyang">沈阳</option>
+            <option value="changchun">长春</option>
+            <option value="haerbin">哈尔滨</option>
+            <option value="nanjing">南京</option>
+            <option value="hangzhou" selected>杭州</option>
+            <option value="hefei">合肥</option>
+            <option value="fuzhou">福州</option>
+            <option value="nanchang">南昌</option>
+            <option value="jinan">济南</option>
+            <option value="zhengzhou">郑州</option>
+            <option value="wuhan">武汉</option>
+            <option value="changsha">长沙</option>
+            <option value="guangzhou">广州</option>
+            <option value="nanning">南宁</option>
+            <option value="haikou">海口</option>
+            <option value="chengdu">成都</option>
+            <option value="guiyang">贵阳</option>
+            <option value="kunming">昆明</option>
+            <option value="lasa">拉萨</option>
+            <option value="xian">西安</option>
+            <option value="lanzhou">兰州</option>
+            <option value="xining">西宁</option>
+            <option value="yinchuan">银川</option>
+            <option value="wulumuqi">乌鲁木齐</option>
+          </optgroup>
+          <optgroup label="计划单列市">
+            <option value="dalian">大连</option>
+            <option value="qingdao">青岛</option>
+            <option value="ningbo">宁波</option>
+            <option value="xiamen">厦门</option>
+            <option value="shenzhen">深圳</option>
+          </optgroup>
+          <optgroup label="其他城市">
+            <option value="suzhou">苏州</option>
+            <option value="wuxi">无锡</option>
+            <option value="foshan">佛山</option>
+            <option value="dongguan">东莞</option>
+            <option value="other">其他城市</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="checkbox-item">
+          <input type="checkbox" id="cityAutoRate" checked />
+          <span>自动同步城市缴存比例与贷款上限</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- 缴存信息 -->
+    <section class="card animate-in animate-in--3">
+      <h2 class="card__title">缴存信息</h2>
+
+      <div class="form-group">
+        <label class="form-label">月缴存基数（通常为月工资）</label>
+        <div class="input-wrap">
+          <input class="input" id="salary" type="number" value="15000" min="0" step="500" placeholder="请输入月缴存基数" />
+          <span class="input-wrap__suffix">元/月</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">个人缴存比例</label>
+        <div class="input-wrap">
+          <input class="input" id="employeeRate" type="number" value="12" min="5" max="12" step="1" />
+          <span class="input-wrap__suffix">%</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">单位缴存比例</label>
+        <div class="input-wrap">
+          <input class="input" id="employerRate" type="number" value="12" min="5" max="12" step="1" />
+          <span class="input-wrap__suffix">%</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">公积金账户余额</label>
+        <div class="input-wrap">
+          <input class="input" id="balance" type="number" value="50000" min="0" step="1000" placeholder="请输入公积金账户余额" />
+          <span class="input-wrap__suffix">元</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">已连续缴存月数</label>
+        <div class="input-wrap">
+          <input class="input" id="contribMonths" type="number" value="36" min="0" step="1" placeholder="请输入已缴存月数" />
+          <span class="input-wrap__suffix">个月</span>
+        </div>
+      </div>
+
+      <!-- 缴存明细 -->
+      <div class="si-detail" id="contribDetail">
+        <div class="si-detail__row">
+          <span class="si-detail__label">个人月缴存额</span>
+          <span class="si-detail__value" id="empContrib">—</span>
+        </div>
+        <div class="si-detail__row">
+          <span class="si-detail__label">单位月缴存额</span>
+          <span class="si-detail__value" id="erContrib">—</span>
+        </div>
+        <div class="si-detail__row si-detail__total">
+          <span class="si-detail__label">月缴存总额</span>
+          <span class="si-detail__value" id="totalContrib">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 贷款信息 -->
+    <section class="card animate-in animate-in--4">
+      <h2 class="card__title">贷款信息</h2>
+
+      <div class="form-group">
+        <label class="form-label">房屋类型</label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="houseType" value="first" checked />
+            <span>首套房</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="houseType" value="second" />
+            <span>二套房</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">申请人情况</label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="applicantType" value="single" checked />
+            <span>单人申请</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="applicantType" value="dual" />
+            <span>双人申请</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">申请人年龄</label>
+        <div class="input-wrap">
+          <input class="input" id="age" type="number" value="30" min="18" max="65" step="1" />
+          <span class="input-wrap__suffix">岁</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">申请人性别</label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="gender" value="male" checked />
+            <span>男性</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="gender" value="female_mgmt" />
+            <span>女性（管理岗）</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="gender" value="female_worker" />
+            <span>女性（工人岗）</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">期望贷款金额</label>
+        <div class="input-wrap">
+          <input class="input" id="loanAmount" type="number" value="800000" min="0" step="10000" placeholder="请输入期望贷款金额" />
+          <span class="input-wrap__suffix">元</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">还款方式</label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="repayMethod" value="equal-payment" checked />
+            <span>等额本息</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="repayMethod" value="equal-principal" />
+            <span>等额本金</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 城市贷款参数提示 -->
+      <div class="info-box" id="cityLoanInfo">
+        <div class="info-box__text" id="cityLoanInfoText">
+          —
+        </div>
+      </div>
+    </section>
+
+    <!-- 计算按钮 -->
+    <section class="animate-in animate-in--5" style="margin-top: var(--sp-5);">
+      <button class="btn btn--primary" id="calcBtn">
+        <span>计算公积金贷款</span>
+      </button>
+    </section>
+
+    <!-- 计算说明（折叠面板） -->
+    <section class="collapse animate-in animate-in--6" id="calcNoteCollapse" style="margin-top: var(--sp-5);">
+      <button class="collapse__header" id="collapseHeader" type="button">
+        <span class="collapse__header-left">
+          <span class="collapse__header-icon">ℹ</span>
+          计算说明与利率表
+        </span>
+        <svg class="collapse__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+      <div class="collapse__body">
+        <div class="collapse__inner">
+          <div class="notice" style="margin-bottom: var(--sp-4);">
+            <div class="notice__text">
+              <p><strong>缴存基数：</strong>通常为职工上年度月平均工资，各地设有上下限。</p>
+              <p><strong>缴存比例：</strong>单位和个人各5%-12%，上海为5%-7%。</p>
+              <p><strong>贷款额度：</strong>取「余额倍数法」与「城市最高限额」的较小值，部分城市采用缴存年限挂钩（如北京）。</p>
+              <p><strong>可贷年限：</strong>最长30年，且贷款期限不超过退休年龄后5年。</p>
+              <p><strong>退休年龄：</strong>男性63岁，女性管理岗58岁，女性工人岗53岁（2025年延迟退休新规）。贷款期限不超过退休年龄后5年。</p>
+              <p><strong>等额本息：</strong>每月还款额固定，前期利息多后期本金多。</p>
+              <p><strong>等额本金：</strong>每月本金固定，利息逐月递减，月供逐月减少。</p>
+            </div>
+          </div>
+          <p style="font-size:13px; font-weight:600; color:var(--text-1); margin-bottom:var(--sp-3);">
+            公积金贷款利率表（2025年5月8日起执行）</p>
+          <table class="rate-table">
+            <thead>
+              <tr>
+                <th>贷款类型</th>
+                <th>≤5年</th>
+                <th>&gt;5年</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>首套房</td>
+                <td>2.10%</td>
+                <td>2.60%</td>
+              </tr>
+              <tr>
+                <td>二套房</td>
+                <td>≥2.525%</td>
+                <td>≥3.075%</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size:13px; font-weight:600; color:var(--text-1); margin: var(--sp-5) 0 var(--sp-3);">
+            各城市公积金贷款额度上限</p>
+          <table class="rate-table">
+            <thead>
+              <tr>
+                <th>城市</th>
+                <th>单人最高</th>
+                <th>双人最高</th>
+                <th>余额倍数</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>北京</td><td>120万</td><td>240万</td><td>年限挂钩</td></tr>
+              <tr><td>上海</td><td>60万</td><td>120万</td><td>—</td></tr>
+              <tr><td>广州</td><td>80万</td><td>120万</td><td>8倍</td></tr>
+              <tr><td>深圳</td><td>60万</td><td>110万</td><td>14倍</td></tr>
+              <tr><td>杭州</td><td>90万</td><td>180万</td><td>20倍</td></tr>
+              <tr><td>成都</td><td>60万</td><td>100万</td><td>20倍</td></tr>
+              <tr><td>武汉</td><td>120万</td><td>150万</td><td>20倍</td></tr>
+              <tr><td>南京</td><td>50万</td><td>100万</td><td>15倍</td></tr>
+              <tr><td>苏州</td><td>120万</td><td>150万</td><td>15倍</td></tr>
+              <tr><td>天津</td><td>60万</td><td>80万</td><td>20倍</td></tr>
+              <tr><td>重庆</td><td>100万</td><td>200万</td><td>20倍</td></tr>
+              <tr><td>西安</td><td>90万</td><td>120万</td><td>15倍</td></tr>
+              <tr><td>其他城市</td><td>60万</td><td>100万</td><td>15倍</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 结果模态框 -->
+  <div class="modal" id="resultModal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal__overlay" data-close></div>
+    <article class="modal__card">
+      <button class="modal__close" data-close aria-label="关闭">✕</button>
+      <h2 class="modal__title">贷款计算结果</h2>
+
+      <div class="result">
+        <!-- 主要结果 -->
+        <div class="result__header">
+          <div class="result__label">月还款额（首月）</div>
+          <div class="result__value" id="monthlyPayment">—</div>
+          <div class="result__sub">贷款总额 <strong id="actualLoanAmount">—</strong> 元　|　贷款年限 <strong id="actualYears">—</strong> 年</div>
+        </div>
+
+        <!-- 关键指标网格 -->
+        <div class="result__grid">
+          <div class="result__item">
+            <div class="result__item-label">月缴存总额</div>
+            <div class="result__item-value result__item-value--accent" id="resultContrib">—</div>
+          </div>
+          <div class="result__item">
+            <div class="result__item-label">可贷额度</div>
+            <div class="result__item-value result__item-value--primary" id="maxLoanable">—</div>
+          </div>
+          <div class="result__item">
+            <div class="result__item-label">贷款利率</div>
+            <div class="result__item-value" id="loanRate">—</div>
+          </div>
+          <div class="result__item">
+            <div class="result__item-label">还款方式</div>
+            <div class="result__item-value" id="repayMethodName">—</div>
+          </div>
+          <div class="result__item">
+            <div class="result__item-label">利息总额</div>
+            <div class="result__item-value result__item-value--warning" id="totalInterest">—</div>
+          </div>
+          <div class="result__item">
+            <div class="result__item-label">还款总额</div>
+            <div class="result__item-value result__item-value--danger" id="totalRepay">—</div>
+          </div>
+          <div class="result__item result__item--full" id="capHintItem" style="display:none;">
+            <div class="result__item-label" id="capHintLabel">—</div>
+            <div class="result__item-value result__item-value--success" id="capHintValue">—</div>
+          </div>
+        </div>
+
+        <!-- 还款明细表 -->
+        <div class="result__section-title">还款明细（前12期 + 汇总）</div>
+        <div style="overflow-x:auto;">
+          <table class="schedule-table" id="scheduleTable">
+            <thead>
+              <tr>
+                <th>期次</th>
+                <th>月供</th>
+                <th>本金</th>
+                <th>利息</th>
+                <th>剩余本金</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleBody">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 还款趋势图 -->
+        <div class="result__section-title">年度还款趋势</div>
+        <div class="chart" id="chart"></div>
+        <div class="chart__legend">
+          <div class="chart__legend-item">
+            <span class="chart__legend-dot" style="background: var(--primary);"></span>
+            <span>本金</span>
+          </div>
+          <div class="chart__legend-item">
+            <span class="chart__legend-dot" style="background: var(--accent); opacity:0.6;"></span>
+            <span>利息</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal__actions" style="margin-top: var(--sp-5);">
+        <button class="btn btn--primary" data-close>知道了</button>
+      </div>
+    </article>
+  </div>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="footer__disclaimer">
+      <div class="footer__disclaimer-title">⚠ 免责声明</div>
+      <div class="footer__disclaimer-text">
+        本计算器计算结果仅供参考，实际可贷额度及利率以当地住房公积金管理中心核定为准。各城市公积金政策差异较大，缴存比例、贷款额度上限、利率可能随时调整。如有疑问，请咨询当地公积金管理中心或拨打住房公积金热线 12329。
+      </div>
+    </div>
+    <p class="footer__brand">✦ 公积金贷款计算器</p>
+    <p>数据来源：住房公积金管理中心 2025年最新政策</p>
+    <p style="margin-top: 4px;">仅供参考，具体以官方政策为准 © <span id="year"></span></p>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* ========== 城市数据 ========== */
+      // 公积金贷款参数：缴存比例范围、贷款上限、余额倍数、基数上下限
+      const CITY_DATA = {
+        beijing: { name: "北京", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2540, baseMax: 35811, singleMax: 1200000, dualMax: 2400000, balanceMult: 0, method: "years", yearsPerLakh: 200000 },
+        shanghai: { name: "上海", empRateMin: 5, empRateMax: 7, erRateMin: 5, erRateMax: 7, baseMin: 2690, baseMax: 37302, singleMax: 600000, dualMax: 1200000, balanceMult: 0, method: "cap" },
+        guangzhou: { name: "广州", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2500, baseMax: 39828, singleMax: 800000, dualMax: 1200000, balanceMult: 8, method: "balance" },
+        shenzhen: { name: "深圳", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2360, baseMax: 44265, singleMax: 600000, dualMax: 1100000, balanceMult: 14, method: "balance" },
+        hangzhou: { name: "杭州", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2490, baseMax: 40694, singleMax: 900000, dualMax: 1800000, balanceMult: 20, method: "balance" },
+        chengdu: { name: "成都", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2288, baseMax: 30564, singleMax: 600000, dualMax: 1000000, balanceMult: 20, method: "balance" },
+        nanjing: { name: "南京", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2265, baseMax: 24003, singleMax: 500000, dualMax: 1000000, balanceMult: 15, method: "balance" },
+        wuhan: { name: "武汉", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2188, baseMax: 23531, singleMax: 1200000, dualMax: 1500000, balanceMult: 20, method: "balance" },
+        tianjin: { name: "天津", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2246, baseMax: 24207, singleMax: 600000, dualMax: 800000, balanceMult: 20, method: "balance" },
+        chongqing: { name: "重庆", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2233, baseMax: 23960, singleMax: 1000000, dualMax: 2000000, balanceMult: 20, method: "balance" },
+        xian: { name: "西安", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2222, baseMax: 22965, singleMax: 900000, dualMax: 1200000, balanceMult: 15, method: "balance" },
+        suzhou: { name: "苏州", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2265, baseMax: 38900, singleMax: 1200000, dualMax: 1500000, balanceMult: 15, method: "balance" },
+        qingdao: { name: "青岛", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2184, baseMax: 22576, singleMax: 360000, dualMax: 600000, balanceMult: 15, method: "balance" },
+        ningbo: { name: "宁波", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2164, baseMax: 22365, singleMax: 800000, dualMax: 1200000, balanceMult: 15, method: "balance" },
+        xiamen: { name: "厦门", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2146, baseMax: 22172, singleMax: 700000, dualMax: 1100000, balanceMult: 12, method: "balance" },
+        dalian: { name: "大连", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2184, baseMax: 22576, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        shijiazhuang: { name: "石家庄", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 600000, dualMax: 1000000, balanceMult: 15, method: "balance" },
+        taiyuan: { name: "太原", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 600000, dualMax: 1000000, balanceMult: 15, method: "balance" },
+        huhehaote: { name: "呼和浩特", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 600000, dualMax: 1000000, balanceMult: 15, method: "balance" },
+        shenyang: { name: "沈阳", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        changchun: { name: "长春", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        haerbin: { name: "哈尔滨", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        hefei: { name: "合肥", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2146, baseMax: 22172, singleMax: 550000, dualMax: 900000, balanceMult: 15, method: "balance" },
+        fuzhou: { name: "福州", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2146, baseMax: 22172, singleMax: 600000, dualMax: 1000000, balanceMult: 15, method: "balance" },
+        nanchang: { name: "南昌", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2146, baseMax: 22172, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        jinan: { name: "济南", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2184, baseMax: 22576, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        zhengzhou: { name: "郑州", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 600000, dualMax: 1000000, balanceMult: 15, method: "balance" },
+        changsha: { name: "长沙", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2217, baseMax: 22912, singleMax: 600000, dualMax: 1000000, balanceMult: 15, method: "balance" },
+        nanning: { name: "南宁", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        haikou: { name: "海口", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        guiyang: { name: "贵阳", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        kunming: { name: "昆明", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        lasa: { name: "拉萨", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        lanzhou: { name: "兰州", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        xining: { name: "西宁", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        yinchuan: { name: "银川", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        wulumuqi: { name: "乌鲁木齐", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2203, baseMax: 22762, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        wuxi: { name: "无锡", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2265, baseMax: 24003, singleMax: 600000, dualMax: 1000000, balanceMult: 15, method: "balance" },
+        foshan: { name: "佛山", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2146, baseMax: 22172, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        dongguan: { name: "东莞", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2167, baseMax: 22397, singleMax: 500000, dualMax: 800000, balanceMult: 12, method: "balance" },
+        other: { name: "其他城市", empRateMin: 5, empRateMax: 12, erRateMin: 5, erRateMax: 12, baseMin: 2000, baseMax: 20000, singleMax: 600000, dualMax: 1000000, balanceMult: 15, method: "balance" },
+      };
+
+      // 公积金贷款利率（2025年5月8日起执行）
+      const LOAN_RATES = {
+        first: { short: 0.021, long: 0.026 },
+        second: { short: 0.02525, long: 0.03075 },
+      };
+
+      // 退休年龄（2025延迟退休新规）
+      const RETIREMENT_AGE = {
+        male: 63,
+        female_mgmt: 58,
+        female_worker: 53,
+      };
+
+      /* ========== 状态 ========== */
+      const state = {
+        city: "hangzhou",
+        cityAutoRate: true,
+        salary: 15000,
+        employeeRate: 12,
+        employerRate: 12,
+        balance: 50000,
+        contribMonths: 36,
+        houseType: "first",
+        applicantType: "single",
+        age: 30,
+        gender: "male",
+        femaleJob: "management",
+        loanAmount: 800000,
+        repayMethod: "equal-payment",
+      };
+
+      /* ========== DOM ========== */
+      const $ = (id) => document.getElementById(id);
+      const els = {
+        citySelect: $("citySelect"),
+        cityAutoRate: $("cityAutoRate"),
+        salary: $("salary"),
+        employeeRate: $("employeeRate"),
+        employerRate: $("employerRate"),
+        balance: $("balance"),
+        contribMonths: $("contribMonths"),
+        age: $("age"),
+        loanAmount: $("loanAmount"),
+        contribDetail: $("contribDetail"),
+        empContrib: $("empContrib"),
+        erContrib: $("erContrib"),
+        totalContrib: $("totalContrib"),
+        cityLoanInfo: $("cityLoanInfo"),
+        cityLoanInfoText: $("cityLoanInfoText"),
+        calcBtn: $("calcBtn"),
+        collapseHeader: $("collapseHeader"),
+        calcNoteCollapse: $("calcNoteCollapse"),
+        resultModal: $("resultModal"),
+        monthlyPayment: $("monthlyPayment"),
+        actualLoanAmount: $("actualLoanAmount"),
+        actualYears: $("actualYears"),
+        resultContrib: $("resultContrib"),
+        maxLoanable: $("maxLoanable"),
+        loanRate: $("loanRate"),
+        repayMethodName: $("repayMethodName"),
+        totalInterest: $("totalInterest"),
+        totalRepay: $("totalRepay"),
+        capHintItem: $("capHintItem"),
+        capHintLabel: $("capHintLabel"),
+        capHintValue: $("capHintValue"),
+        scheduleBody: $("scheduleBody"),
+        chart: $("chart"),
+        year: $("year"),
+      };
+
+      /* ========== 工具函数 ========== */
+      function getCity() {
+        return CITY_DATA[state.city] || CITY_DATA.other;
+      }
+
+      function getInputNum(el) {
+        const v = parseFloat(el.value);
+        return isNaN(v) ? 0 : v;
+      }
+
+      function fmtMoney(n) {
+        return Math.round(n).toLocaleString("zh-CN");
+      }
+
+      function fmtRate(r) {
+        return (r * 100).toFixed(2) + "%";
+      }
+
+      function fmtWan(n) {
+        return (n / 10000).toFixed(1) + "万";
+      }
+
+      /* ========== 缴存额计算 ========== */
+      function calcContribution() {
+        const city = getCity();
+        let base = state.salary;
+        base = Math.max(city.baseMin, Math.min(base, city.baseMax));
+        // 缴存比例限制在城市范围内
+        const empRate = Math.max(city.empRateMin, Math.min(state.employeeRate, city.empRateMax));
+        const erRate = Math.max(city.erRateMin, Math.min(state.employerRate, city.erRateMax));
+        const empContrib = base * (empRate / 100);
+        const erContrib = base * (erRate / 100);
+        return { base, empRate, erRate, empContrib, erContrib, total: empContrib + erContrib };
+      }
+
+      function renderContribDetail() {
+        const c = calcContribution();
+        els.empContrib.textContent = "¥" + fmtMoney(c.empContrib);
+        els.erContrib.textContent = "¥" + fmtMoney(c.erContrib);
+        els.totalContrib.textContent = "¥" + fmtMoney(c.total);
+      }
+
+      /* ========== 城市切换 ========== */
+      function onCityChange() {
+        state.city = els.citySelect.value;
+        const city = getCity();
+
+        if (state.cityAutoRate) {
+          state.employeeRate = city.empRateMax;
+          state.employerRate = city.erRateMax;
+          els.employeeRate.value = city.empRateMax;
+          els.employerRate.value = city.erRateMax;
+        }
+
+        // 更新城市贷款参数提示
+        const singleMax = fmtWan(city.singleMax);
+        const dualMax = fmtWan(city.dualMax);
+        let methodText = "";
+        if (city.method === "years") {
+          methodText = "按缴存年限计算：每满1年可贷" + fmtWan(city.yearsPerLakh);
+        } else if (city.method === "balance") {
+          methodText = "按账户余额×" + city.balanceMult + "倍计算";
+        } else {
+          methodText = "按城市最高限额确定";
+        }
+        els.cityLoanInfoText.innerHTML =
+          "<strong>" + city.name + "：</strong>" +
+          "单人最高" + singleMax + "，双人最高" + dualMax + "。" + methodText +
+          "。缴存比例" + city.empRateMin + "%-" + city.empRateMax + "%。";
+
+        renderContribDetail();
+      }
+
+      /* ========== 可贷额度计算 ========== */
+      function calcMaxLoanable() {
+        const city = getCity();
+        const contrib = calcContribution();
+        const cap = state.applicantType === "dual" ? city.dualMax : city.singleMax;
+        let balanceBased = Infinity;
+
+        if (city.method === "years") {
+          // 北京模式：缴存年限挂钩，每满1年可贷N万
+          const years = Math.floor(state.contribMonths / 12);
+          balanceBased = years * city.yearsPerLakh * (state.applicantType === "dual" ? 2 : 1);
+        } else if (city.method === "balance") {
+          // 余额倍数法 + 月缴存额×到退休月数（广州等城市模式）
+          const retireAge = getRetireAge();
+          const monthsToRetire = Math.max(0, (retireAge - state.age) * 12);
+          balanceBased = state.balance * city.balanceMult + contrib.total * monthsToRetire;
+        }
+
+        const maxLoanable = Math.min(balanceBased, cap);
+        return { maxLoanable, cap, balanceBased, method: city.method };
+      }
+
+      /* ========== 可贷年限计算 ========== */
+      function calcMaxYears() {
+        const retireAge = RETIREMENT_AGE[state.gender] || 63;
+        const yearsToRetire = retireAge - state.age + 5;
+        return Math.max(1, Math.min(30, yearsToRetire));
+      }
+
+      // 获取退休年龄（供可贷额度计算复用）
+      function getRetireAge() {
+        return RETIREMENT_AGE[state.gender] || 63;
+      }
+
+      /* ========== 还款计算 ========== */
+      // 等额本息：每月还款额固定
+      function calcEqualPayment(principal, annualRate, years) {
+        const n = years * 12;
+        const r = annualRate / 12;
+        if (r === 0) {
+          const m = principal / n;
+          return { monthly: m, schedule: Array.from({ length: n }, (_, i) => ({
+            month: i + 1, payment: m, principal: m, interest: 0, remaining: principal - m * (i + 1)
+          }))};
+        }
+        const monthly = principal * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+        const schedule = [];
+        let remaining = principal;
+        for (let i = 0; i < n; i++) {
+          const interest = remaining * r;
+          const principalPart = monthly - interest;
+          remaining -= principalPart;
+          schedule.push({
+            month: i + 1,
+            payment: monthly,
+            principal: principalPart,
+            interest: interest,
+            remaining: Math.max(0, remaining),
+          });
+        }
+        return { monthly, schedule };
+      }
+
+      // 等额本金：每月本金固定，利息递减
+      function calcEqualPrincipal(principal, annualRate, years) {
+        const n = years * 12;
+        const r = annualRate / 12;
+        const monthlyPrincipal = principal / n;
+        const schedule = [];
+        let remaining = principal;
+        let firstMonthly = 0;
+        for (let i = 0; i < n; i++) {
+          const interest = remaining * r;
+          const payment = monthlyPrincipal + interest;
+          if (i === 0) firstMonthly = payment;
+          remaining -= monthlyPrincipal;
+          schedule.push({
+            month: i + 1,
+            payment: payment,
+            principal: monthlyPrincipal,
+            interest: interest,
+            remaining: Math.max(0, remaining),
+          });
+        }
+        return { monthly: firstMonthly, schedule };
+      }
+
+      /* ========== 主计算函数 ========== */
+      function calculate() {
+        const contrib = calcContribution();
+        const loanInfo = calcMaxLoanable();
+        const maxYears = calcMaxYears();
+
+        // 实际贷款额 = min(期望额度, 可贷额度)
+        const actualLoan = Math.min(state.loanAmount, loanInfo.maxLoanable);
+        const actualYears = maxYears;
+
+        // 利率
+        const rateConfig = LOAN_RATES[state.houseType];
+        const annualRate = actualYears <= 5 ? rateConfig.short : rateConfig.long;
+
+        // 还款计算
+        let result;
+        if (state.repayMethod === "equal-payment") {
+          result = calcEqualPayment(actualLoan, annualRate, actualYears);
+        } else {
+          result = calcEqualPrincipal(actualLoan, annualRate, actualYears);
+        }
+
+        const totalRepay = result.schedule.reduce((s, m) => s + m.payment, 0);
+        const totalInterest = totalRepay - actualLoan;
+
+        // 是否被额度限制
+        const isCapped = state.loanAmount > loanInfo.maxLoanable;
+
+        return {
+          contrib,
+          loanInfo,
+          maxYears,
+          actualLoan,
+          actualYears,
+          annualRate,
+          repayMethod: state.repayMethod,
+          monthly: result.monthly,
+          schedule: result.schedule,
+          totalRepay,
+          totalInterest,
+          isCapped,
+        };
+      }
+
+      /* ========== 渲染结果 ========== */
+      function renderResult(r) {
+        // 主要结果
+        els.monthlyPayment.textContent = "¥" + fmtMoney(r.monthly);
+        els.actualLoanAmount.textContent = fmtMoney(r.actualLoan);
+        els.actualYears.textContent = r.actualYears;
+
+        // 关键指标
+        els.resultContrib.textContent = "¥" + fmtMoney(r.contrib.total);
+        els.maxLoanable.textContent = fmtWan(r.loanInfo.maxLoanable);
+        els.loanRate.textContent = fmtRate(r.annualRate);
+        els.repayMethodName.textContent = r.repayMethod === "equal-payment" ? "等额本息" : "等额本金";
+        els.totalInterest.textContent = "¥" + fmtMoney(r.totalInterest);
+        els.totalRepay.textContent = "¥" + fmtMoney(r.totalRepay);
+
+        // 额度限制提示
+        if (r.actualLoan <= 0) {
+          els.capHintItem.style.display = "";
+          els.capHintLabel.textContent = "可贷额度不足，请检查账户余额或缴存月数";
+          els.capHintValue.textContent = "无法计算";
+        } else if (r.isCapped) {
+          els.capHintItem.style.display = "";
+          els.capHintLabel.textContent = "期望贷款超过可贷额度，已按最高可贷额度计算";
+          els.capHintValue.textContent = fmtWan(r.loanInfo.maxLoanable);
+        } else {
+          els.capHintItem.style.display = "none";
+        }
+
+        // 还款明细表（前12期 + 汇总）
+        renderSchedule(r);
+
+        // 年度还款趋势图
+        renderChart(r);
+      }
+
+      function renderSchedule(r) {
+        const rows = [];
+        const showMonths = Math.min(12, r.schedule.length);
+        for (let i = 0; i < showMonths; i++) {
+          const m = r.schedule[i];
+          rows.push(
+            '<tr>' +
+            '<td>第' + m.month + '期</td>' +
+            '<td>' + fmtMoney(m.payment) + '</td>' +
+            '<td>' + fmtMoney(m.principal) + '</td>' +
+            '<td>' + fmtMoney(m.interest) + '</td>' +
+            '<td>' + fmtMoney(m.remaining) + '</td>' +
+            '</tr>'
+          );
+        }
+        // 汇总行
+        rows.push(
+          '<tr class="summary">' +
+          '<td>合计</td>' +
+          '<td>' + fmtMoney(r.totalRepay) + '</td>' +
+          '<td>' + fmtMoney(r.actualLoan) + '</td>' +
+          '<td>' + fmtMoney(r.totalInterest) + '</td>' +
+          '<td>—</td>' +
+          '</tr>'
+        );
+        els.scheduleBody.innerHTML = rows.join("");
+      }
+
+      function renderChart(r) {
+        // 按年度汇总
+        const years = Math.ceil(r.schedule.length / 12);
+        const yearData = [];
+        for (let y = 0; y < years; y++) {
+          let principal = 0, interest = 0;
+          for (let m = 0; m < 12; m++) {
+            const idx = y * 12 + m;
+            if (idx >= r.schedule.length) break;
+            principal += r.schedule[idx].principal;
+            interest += r.schedule[idx].interest;
+          }
+          yearData.push({ principal, interest });
+        }
+
+        const maxTotal = Math.max(...yearData.map(d => d.principal + d.interest));
+        const showYears = Math.min(years, 30);
+
+        let html = "";
+        for (let i = 0; i < showYears; i++) {
+          const d = yearData[i];
+          const pH = (d.principal / maxTotal * 80).toFixed(0);
+          const iH = (d.interest / maxTotal * 80).toFixed(0);
+          html +=
+            '<div class="chart__bar-group">' +
+            '<div class="chart__bars">' +
+            '<div class="chart__bar chart__bar--principal" style="height:' + pH + 'px"></div>' +
+            '<div class="chart__bar chart__bar--interest" style="height:' + iH + 'px"></div>' +
+            '</div>' +
+            '<div class="chart__month">' + (i + 1) + '年</div>' +
+            '</div>';
+        }
+        els.chart.innerHTML = html;
+      }
+
+      /* ========== 弹窗控制 ========== */
+      function openModal() {
+        els.resultModal.classList.add("is-open");
+        els.resultModal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeModal() {
+        els.resultModal.classList.remove("is-open");
+        els.resultModal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+
+      /* ========== 事件绑定 ========== */
+      function bindEvents() {
+        // 城市选择
+        els.citySelect.addEventListener("change", onCityChange);
+
+        // 自动同步城市比例
+        els.cityAutoRate.addEventListener("change", () => {
+          state.cityAutoRate = els.cityAutoRate.checked;
+          if (state.cityAutoRate) onCityChange();
+        });
+
+        // 输入项
+        els.salary.addEventListener("input", () => {
+          state.salary = getInputNum(els.salary);
+          renderContribDetail();
+        });
+
+        els.employeeRate.addEventListener("input", () => {
+          state.employeeRate = getInputNum(els.employeeRate);
+          renderContribDetail();
+        });
+
+        els.employerRate.addEventListener("input", () => {
+          state.employerRate = getInputNum(els.employerRate);
+          renderContribDetail();
+        });
+
+        els.balance.addEventListener("input", () => {
+          state.balance = getInputNum(els.balance);
+        });
+
+        els.contribMonths.addEventListener("input", () => {
+          state.contribMonths = getInputNum(els.contribMonths);
+        });
+
+        els.age.addEventListener("input", () => {
+          state.age = getInputNum(els.age);
+        });
+
+        els.loanAmount.addEventListener("input", () => {
+          state.loanAmount = getInputNum(els.loanAmount);
+        });
+
+        // 单选组
+        document.querySelectorAll('input[name="houseType"]').forEach((radio) => {
+          radio.addEventListener("change", (e) => {
+            state.houseType = e.target.value;
+          });
+        });
+
+        document.querySelectorAll('input[name="applicantType"]').forEach((radio) => {
+          radio.addEventListener("change", (e) => {
+            state.applicantType = e.target.value;
+          });
+        });
+
+        document.querySelectorAll('input[name="gender"]').forEach((radio) => {
+          radio.addEventListener("change", (e) => {
+            state.gender = e.target.value;
+            // 性别变更后重新渲染缴存明细（影响可贷额度）
+            renderContribDetail();
+          });
+        });
+
+        document.querySelectorAll('input[name="repayMethod"]').forEach((radio) => {
+          radio.addEventListener("change", (e) => {
+            state.repayMethod = e.target.value;
+          });
+        });
+
+        // 计算按钮
+        els.calcBtn.addEventListener("click", () => {
+          const r = calculate();
+          renderResult(r);
+          openModal();
+        });
+
+        // 折叠面板
+        els.collapseHeader.addEventListener("click", () => {
+          els.calcNoteCollapse.classList.toggle("is-open");
+        });
+
+        // 弹窗关闭
+        els.resultModal.querySelectorAll("[data-close]").forEach((el) => {
+          el.addEventListener("click", closeModal);
+        });
+
+        // ESC 关闭弹窗
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && els.resultModal.classList.contains("is-open")) {
+            closeModal();
+          }
+        });
+      }
+
+      /* ========== 初始化 ========== */
+      function init() {
+        els.year.textContent = new Date().getFullYear();
+        onCityChange();
+        bindEvents();
+
+        // 导航栏滚动
+        const nav = $("nav");
+        window.addEventListener("scroll", () => {
+          if (window.scrollY > 10) {
+            nav.classList.add("scrolled");
+          } else {
+            nav.classList.remove("scrolled");
+          }
+        }, { passive: true });
+      }
+
+      init();
+    })();
+  </script>
+</body>
+
+</html>

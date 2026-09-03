@@ -1,0 +1,2579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0b14" />
+  <meta name="description" content="个税计算器 - 2026最新个人所得税税率表，支持五险一金、专项附加扣除和年终奖单独计税" />
+  <title>个税计算器</title>
+  <style>
+    /* ========== 设计令牌 ========== */
+    :root {
+      --bg-0: #07070f;
+      --bg-1: #0b0b14;
+      --bg-2: #11111d;
+      --surface: rgba(255, 255, 255, 0.04);
+      --surface-2: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --primary: #8b5cf6;
+      --primary-2: #6366f1;
+      --primary-soft: rgba(139, 92, 246, 0.16);
+      --accent: #22d3ee;
+      --accent-soft: rgba(34, 211, 238, 0.14);
+      --text-1: #f5f5fa;
+      --text-2: #b4b4c7;
+      --text-3: #6f6f87;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --r-sm: 10px;
+      --r-md: 16px;
+      --r-lg: 22px;
+      --r-pill: 999px;
+      --sp-1: 4px;
+      --sp-2: 8px;
+      --sp-3: 12px;
+      --sp-4: 16px;
+      --sp-5: 20px;
+      --sp-6: 24px;
+      --sp-8: 32px;
+      --sp-10: 40px;
+      --nav-h: 64px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --shadow-card: 0 10px 30px -12px rgba(0, 0, 0, .6), 0 2px 6px rgba(0, 0, 0, .4);
+    }
+
+    /* ========== 基础重置 ========== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      font-family: "Inter", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg-0);
+      color: var(--text-1);
+      font-size: 14px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    /* ========== 背景光晕装饰 ========== */
+    .bg-glow {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(60% 50% at 18% -8%, rgba(139, 92, 246, 0.22), transparent 70%),
+        radial-gradient(50% 45% at 92% 4%, rgba(34, 211, 238, 0.14), transparent 70%),
+        radial-gradient(70% 60% at 50% 110%, rgba(99, 102, 241, 0.18), transparent 70%);
+    }
+
+    .bg-glow::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%);
+    }
+
+    /* ========== 容器 ========== */
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0 var(--sp-4);
+    }
+
+    /* ========== 导航栏 ========== */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: var(--nav-h);
+      background: rgba(11, 11, 20, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s var(--ease);
+    }
+
+    .nav.scrolled {
+      background: rgba(8, 8, 15, 0.92);
+    }
+
+    .nav__inner {
+      max-width: 640px;
+      height: 100%;
+      margin: 0 auto;
+      padding: 0 var(--sp-4);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+    }
+
+    .nav__logo {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      text-decoration: none;
+      color: var(--text-1);
+    }
+
+    .nav__logo-mark {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border-radius: var(--r-sm);
+      font-size: 16px;
+    }
+
+    .nav__logo-text {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .nav__logo-text em {
+      font-style: normal;
+      color: var(--primary);
+    }
+
+    /* ========== Hero 区 ========== */
+    .hero {
+      padding: var(--sp-6) 0 var(--sp-6);
+      text-align: center;
+    }
+
+    .hero__title {
+      font-size: clamp(28px, 8vw, 44px);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--sp-4);
+      background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero__subtitle {
+      font-size: 14px;
+      color: var(--text-2);
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    /* ========== 卡片 ========== */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: var(--sp-6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-card);
+      transition: border-color 0.3s var(--ease);
+    }
+
+    .card+.card {
+      margin-top: var(--sp-5);
+    }
+
+    .card__title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: var(--sp-5);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+
+    .card__title::before {
+      content: "";
+      width: 3px;
+      height: 16px;
+      background: linear-gradient(180deg, var(--primary), var(--accent));
+      border-radius: 2px;
+    }
+
+    /* 可折叠卡片标题 */
+    .card__collapse-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      cursor: pointer;
+      text-align: left;
+      padding: 0;
+      transition: opacity 0.2s var(--ease);
+    }
+
+    .card__collapse-trigger:hover {
+      opacity: 0.9;
+    }
+
+    .card__collapse-summary {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 500;
+      background: var(--accent-soft);
+      padding: 4px 10px;
+      border-radius: var(--r-pill);
+      white-space: nowrap;
+    }
+
+    .card__collapse-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s var(--ease);
+    }
+
+    .card.is-open .card__collapse-body {
+      max-height: 1500px;
+    }
+
+    .card.is-open #dedArrow {
+      transform: rotate(180deg);
+      color: var(--primary);
+    }
+
+    #dedArrow {
+      width: 20px;
+      height: 20px;
+      color: var(--text-3);
+      transition: transform 0.3s var(--ease);
+      flex-shrink: 0;
+    }
+
+    .card__collapse-inner {
+      padding-top: var(--sp-5);
+    }
+
+    /* ========== 表单 ========== */
+    .form-group {
+      margin-bottom: var(--sp-5);
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-2);
+      margin-bottom: var(--sp-2);
+      font-weight: 500;
+    }
+
+    .form-row {
+      display: flex;
+      gap: var(--sp-3);
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      height: 48px;
+      padding: 0 var(--sp-4);
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      color: var(--text-1);
+      font-size: 15px;
+      transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .input:focus,
+    .select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(139, 92, 246, 0.06);
+    }
+
+    .input::placeholder {
+      color: var(--text-3);
+    }
+
+    .input:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b4b4c7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      padding-right: 40px;
+      cursor: pointer;
+    }
+
+    .select:invalid {
+      color: var(--text-3);
+    }
+
+    .select option {
+      color: var(--text-1);
+      background: var(--bg-2);
+    }
+
+    /* 输入框带单位后缀 */
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap .input {
+      padding-right: 48px;
+    }
+
+    .input-wrap__suffix {
+      position: absolute;
+      right: var(--sp-4);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      font-size: 13px;
+      pointer-events: none;
+    }
+
+    /* 复选框 */
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-2);
+      transition: color 0.2s var(--ease);
+    }
+
+    .checkbox-item:hover {
+      color: var(--text-1);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-strong);
+      border-radius: 6px;
+      background: var(--bg-2);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s var(--ease);
+      flex-shrink: 0;
+    }
+
+    .checkbox-item input[type="checkbox"]:checked {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    }
+
+    .checkbox-item input[type="checkbox"]:checked::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 6px;
+      width: 5px;
+      height: 9px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    /* 单选按钮组 */
+    .radio-group {
+      display: flex;
+      gap: var(--sp-6);
+      padding: var(--sp-3) 0;
+    }
+
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-2);
+      transition: color 0.2s var(--ease);
+    }
+
+    .radio-item:hover {
+      color: var(--text-1);
+    }
+
+    .radio-item input[type="radio"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-strong);
+      border-radius: 50%;
+      background: var(--bg-2);
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.2s var(--ease);
+      flex-shrink: 0;
+    }
+
+    .radio-item input[type="radio"]:checked {
+      border-color: var(--primary);
+    }
+
+    .radio-item input[type="radio"]:checked::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    }
+
+    .radio-item input[type="radio"]:checked+span {
+      color: var(--text-1);
+      font-weight: 500;
+    }
+
+    /* 专项附加扣除行 */
+    .deduction-row {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-3);
+      padding: var(--sp-4) 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .deduction-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .deduction-row:first-child {
+      padding-top: 0;
+    }
+
+    .deduction-row__main {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .deduction-row__label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-1);
+      margin-bottom: 2px;
+    }
+
+    .deduction-row__desc {
+      font-size: 12px;
+      color: var(--text-3);
+    }
+
+    .deduction-row__input {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      margin-top: var(--sp-2);
+    }
+
+    .deduction-row__input .input {
+      height: 40px;
+      font-size: 13px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .deduction-row__input .select {
+      height: 40px;
+      font-size: 13px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .deduction-row__checkbox {
+      flex-shrink: 0;
+      padding-top: 2px;
+    }
+
+    .deduction-row__text {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      margin-top: var(--sp-2);
+      flex-wrap: wrap;
+    }
+
+    .deduction-static-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .deduction-static-unit {
+      font-size: 12px;
+      color: var(--text-3);
+    }
+
+    .deduction-city-label {
+      font-size: 12px;
+      color: var(--text-2);
+      background: var(--bg-2);
+      padding: 4px 10px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    /* 五险一金明细 */
+    .si-detail {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: var(--sp-4);
+      margin-top: var(--sp-4);
+    }
+
+    .si-detail__row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 13px;
+    }
+
+    .si-detail__row+.si-detail__row {
+      border-top: 1px solid var(--border);
+    }
+
+    .si-detail__label {
+      color: var(--text-2);
+    }
+
+    .si-detail__value {
+      color: var(--text-1);
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .si-detail__total {
+      margin-top: var(--sp-2);
+      padding-top: var(--sp-3);
+      border-top: 1px solid var(--border-strong);
+    }
+
+    .si-detail__total .si-detail__label {
+      color: var(--text-1);
+      font-weight: 600;
+    }
+
+    .si-detail__total .si-detail__value {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    /* ========== 按钮 ========== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+      height: 52px;
+      padding: 0 var(--sp-6);
+      border-radius: var(--r-md);
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.2s var(--ease);
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .btn--primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn--primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 32px rgba(139, 92, 246, 0.4);
+    }
+
+    .btn--primary:active {
+      transform: translateY(0);
+    }
+
+    .btn--ghost {
+      background: var(--surface);
+      color: var(--text-1);
+      border: 1px solid var(--border);
+    }
+
+    .btn--ghost:hover {
+      background: var(--surface-2);
+      border-color: var(--border-strong);
+    }
+
+    /* ========== 模态框 ========== */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--sp-4);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s var(--ease), visibility 0.3s var(--ease);
+    }
+
+    .modal.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal__overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .modal__card {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: var(--bg-1);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--r-lg);
+      padding: var(--sp-6);
+      box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .75), 0 0 0 1px var(--border);
+      transform: scale(0.96) translateY(12px);
+      transition: transform 0.35s var(--ease);
+    }
+
+    .modal.is-open .modal__card {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal__close {
+      position: absolute;
+      top: var(--sp-4);
+      right: var(--sp-4);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--r-md);
+      color: var(--text-2);
+      font-size: 18px;
+      transition: all 0.2s var(--ease);
+      z-index: 1;
+    }
+
+    .modal__close:hover {
+      background: var(--surface-2);
+      color: var(--text-1);
+    }
+
+    .modal__title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: var(--sp-5);
+      text-align: center;
+      padding-right: var(--sp-8);
+    }
+
+    /* 结果区域 */
+    .result__header {
+      text-align: center;
+      padding-bottom: var(--sp-5);
+      margin-bottom: var(--sp-5);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .result__label {
+      font-size: 13px;
+      color: var(--text-2);
+      margin-bottom: var(--sp-2);
+    }
+
+    .result__value {
+      font-size: clamp(32px, 10vw, 48px);
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--primary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .result__unit {
+      font-size: 0.4em;
+      font-weight: 600;
+    }
+
+    .result__sub {
+      font-size: 13px;
+      color: var(--text-3);
+      margin-top: var(--sp-2);
+    }
+
+    .result__sub strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .result__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-3);
+    }
+
+    .result__item {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: var(--sp-4);
+    }
+
+    .result__item-label {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-bottom: var(--sp-1);
+    }
+
+    .result__item-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-1);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .result__item-value--accent {
+      color: var(--accent);
+    }
+
+    .result__item-value--primary {
+      color: var(--primary);
+    }
+
+    .result__item-value--success {
+      color: var(--success);
+    }
+
+    .result__item-value--warning {
+      color: var(--warning);
+    }
+
+    .result__item-value--danger {
+      color: var(--danger);
+    }
+
+    .result__item--full {
+      grid-column: 1 / -1;
+    }
+
+    /* 月度税收柱状图 */
+    .result__section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-1);
+      margin-bottom: var(--sp-3);
+      margin-top: var(--sp-5);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+
+    .result__section-title::before {
+      content: "";
+      width: 3px;
+      height: 14px;
+      background: linear-gradient(180deg, var(--primary), var(--accent));
+      border-radius: 2px;
+    }
+
+    .chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 120px;
+      padding: var(--sp-3) 0;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: var(--sp-3) var(--sp-3) var(--sp-2);
+    }
+
+    .chart__bar-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      height: 100%;
+      justify-content: flex-end;
+      min-width: 0;
+    }
+
+    .chart__bar {
+      width: 100%;
+      max-width: 20px;
+      background: linear-gradient(180deg, var(--accent), var(--primary));
+      border-radius: 4px 4px 0 0;
+      transition: height 0.4s var(--ease);
+      min-height: 2px;
+      position: relative;
+    }
+
+    .chart__bar--bonus {
+      background: linear-gradient(180deg, var(--warning), #d97706);
+    }
+
+    .chart__month {
+      font-size: 9px;
+      color: var(--text-3);
+      line-height: 1;
+    }
+
+    /* 扣除明细列表 */
+    .breakdown {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: var(--sp-4);
+    }
+
+    .breakdown__row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 13px;
+    }
+
+    .breakdown__row+.breakdown__row {
+      border-top: 1px solid var(--border);
+    }
+
+    .breakdown__label {
+      color: var(--text-2);
+    }
+
+    .breakdown__value {
+      color: var(--text-1);
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .breakdown__row--total {
+      margin-top: var(--sp-2);
+      padding-top: var(--sp-3);
+      border-top: 1px solid var(--border-strong);
+    }
+
+    .breakdown__row--total .breakdown__label {
+      color: var(--text-1);
+      font-weight: 600;
+    }
+
+    .breakdown__row--total .breakdown__value {
+      color: var(--danger);
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    /* 模态框底部按钮 */
+    .modal__actions {
+      display: flex;
+      justify-content: end;
+      gap: var(--sp-3);
+      margin-top: var(--sp-6);
+    }
+
+    .modal__actions .btn {
+      height: 48px;
+      width: 120px;
+      font-size: 14px;
+    }
+
+    /* ========== 折叠面板 ========== */
+    .collapse {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      transition: border-color 0.3s var(--ease);
+    }
+
+    .collapse:hover {
+      border-color: var(--border-strong);
+    }
+
+    .collapse__header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--sp-4) var(--sp-5);
+      cursor: pointer;
+      transition: background 0.2s var(--ease);
+    }
+
+    .collapse__header:hover {
+      background: var(--surface-2);
+    }
+
+    .collapse__header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-1);
+    }
+
+    .collapse__header-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .collapse__arrow {
+      width: 20px;
+      height: 20px;
+      color: var(--text-3);
+      transition: transform 0.3s var(--ease);
+      flex-shrink: 0;
+    }
+
+    .collapse.is-open .collapse__arrow {
+      transform: rotate(180deg);
+      color: var(--primary);
+    }
+
+    .collapse__body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s var(--ease);
+    }
+
+    .collapse.is-open .collapse__body {
+      max-height: 1200px;
+    }
+
+    .collapse__inner {
+      padding: 0 var(--sp-5) var(--sp-5);
+    }
+
+    .notice {
+      background: var(--accent-soft);
+      border: 1px solid rgba(34, 211, 238, 0.2);
+      border-radius: var(--r-md);
+      padding: var(--sp-4);
+    }
+
+    .notice__text {
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.8;
+    }
+
+    .notice__text p {
+      margin-bottom: 6px;
+    }
+
+    .notice__text p:last-child {
+      margin-bottom: 0;
+    }
+
+    .notice__text strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* 税率表 */
+    .tax-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      color: var(--text-2);
+    }
+
+    .tax-table th,
+    .tax-table td {
+      padding: var(--sp-2) var(--sp-3);
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tax-table th {
+      color: var(--text-1);
+      font-weight: 600;
+      background: var(--bg-2);
+    }
+
+    .tax-table td:first-child,
+    .tax-table th:first-child {
+      text-align: left;
+    }
+
+    /* ========== 页脚 ========== */
+    .footer {
+      text-align: center;
+      padding: var(--sp-8) 0 var(--sp-6);
+      color: var(--text-3);
+      font-size: 12px;
+    }
+
+    .footer__brand {
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: var(--sp-2);
+    }
+
+    .footer__disclaimer {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: var(--sp-4);
+      margin-bottom: var(--sp-4);
+      text-align: left;
+    }
+
+    .footer__disclaimer-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--warning);
+      margin-bottom: var(--sp-2);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+
+    .footer__disclaimer-text {
+      font-size: 12px;
+      color: var(--text-3);
+      line-height: 1.8;
+    }
+
+    /* ========== 动画 ========== */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-in {
+      animation: fadeInUp 0.6s var(--ease) forwards;
+      opacity: 0;
+    }
+
+    .animate-in--1 {
+      animation-delay: 0.05s;
+    }
+
+    .animate-in--2 {
+      animation-delay: 0.1s;
+    }
+
+    .animate-in--3 {
+      animation-delay: 0.15s;
+    }
+
+    .animate-in--4 {
+      animation-delay: 0.2s;
+    }
+
+    .animate-in--5 {
+      animation-delay: 0.25s;
+    }
+
+    .animate-in--6 {
+      animation-delay: 0.3s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ========== 响应式 ========== */
+    @media (max-width: 480px) {
+      .card {
+        padding: var(--sp-5);
+      }
+
+      .result__item-value {
+        font-size: 14px;
+      }
+
+      .chart__month {
+        font-size: 8px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 背景光晕装饰 -->
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- 顶部导航 -->
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a class="nav__logo" href="#top">
+        <span class="nav__logo-mark">✦</span>
+        <span class="nav__logo-text">个税<em>计算器</em></span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container" id="top">
+    <!-- Hero 区 -->
+    <section class="hero animate-in animate-in--1">
+      <h1 class="hero__title">个人所得税计算器</h1>
+      <p class="hero__subtitle">基于2026年最新个税税率表，支持按城市计算五险一金、七项专项附加扣除及年终奖单独计税</p>
+    </section>
+
+    <!-- 所在城市 -->
+    <section class="card animate-in animate-in--2">
+      <h2 class="card__title">所在城市</h2>
+      <div class="form-group">
+        <label class="form-label">选择城市</label>
+        <select class="select" id="citySelect">
+          <optgroup label="直辖市（第一档·1500元）">
+            <option value="beijing">北京</option>
+            <option value="shanghai">上海</option>
+            <option value="tianjin">天津</option>
+            <option value="chongqing">重庆</option>
+          </optgroup>
+          <optgroup label="省会/首府城市（第一档·1500元）">
+            <option value="shijiazhuang">石家庄</option>
+            <option value="taiyuan">太原</option>
+            <option value="huhehaote">呼和浩特</option>
+            <option value="shenyang">沈阳</option>
+            <option value="changchun">长春</option>
+            <option value="haerbin">哈尔滨</option>
+            <option value="nanjing">南京</option>
+            <option value="hangzhou" selected>杭州</option>
+            <option value="hefei">合肥</option>
+            <option value="fuzhou">福州</option>
+            <option value="nanchang">南昌</option>
+            <option value="jinan">济南</option>
+            <option value="zhengzhou">郑州</option>
+            <option value="wuhan">武汉</option>
+            <option value="changsha">长沙</option>
+            <option value="guangzhou">广州</option>
+            <option value="nanning">南宁</option>
+            <option value="haikou">海口</option>
+            <option value="chengdu">成都</option>
+            <option value="guiyang">贵阳</option>
+            <option value="kunming">昆明</option>
+            <option value="lasa">拉萨</option>
+            <option value="xian">西安</option>
+            <option value="lanzhou">兰州</option>
+            <option value="xining">西宁</option>
+            <option value="yinchuan">银川</option>
+            <option value="wulumuqi">乌鲁木齐</option>
+          </optgroup>
+          <optgroup label="计划单列市（第一档·1500元）">
+            <option value="dalian">大连</option>
+            <option value="qingdao">青岛</option>
+            <option value="ningbo">宁波</option>
+            <option value="xiamen">厦门</option>
+            <option value="shenzhen">深圳</option>
+          </optgroup>
+          <optgroup label="其他城市（第二档·1100元）">
+            <option value="suzhou">苏州</option>
+            <option value="wuxi">无锡</option>
+            <option value="foshan">佛山</option>
+            <option value="dongguan">东莞</option>
+            <option value="wenzhou">温州</option>
+            <option value="zhuhai">珠海</option>
+            <option value="xuzhou">徐州</option>
+            <option value="yantai">烟台</option>
+            <option value="tangshan">唐山</option>
+            <option value="luoyang">洛阳</option>
+            <option value="xiangyang">襄阳</option>
+            <option value="yichang">宜昌</option>
+            <option value="zhuzhou">株洲</option>
+            <option value="huizhou">惠州</option>
+            <option value="jiangmen">江门</option>
+            <option value="liuzhou">柳州</option>
+            <option value="guilin">桂林</option>
+            <option value="nanchong">南充</option>
+            <option value="mianyang">绵阳</option>
+            <option value="baoji">宝鸡</option>
+          </optgroup>
+          <optgroup label="其他城市（第三档·800元）">
+            <option value="other_small">市辖区人口≤100万的城市</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="checkbox-item">
+          <input type="checkbox" id="cityAutoSI" checked />
+          <span>自动同步城市社保公积金缴费基数与比例</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- 收入信息 -->
+    <section class="card animate-in animate-in--3">
+      <h2 class="card__title">收入信息</h2>
+
+      <div class="form-group">
+        <label class="form-label">税前月工资</label>
+        <div class="input-wrap">
+          <input class="input" id="salary" type="number" placeholder="请输入税前月工资" value="15000" min="0" step="100" />
+          <span class="input-wrap__suffix">元/月</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">年终奖（可选）</label>
+        <div class="input-wrap">
+          <input class="input" id="bonus" type="number" placeholder="请输入年终奖金额" value="0" min="0" step="1000" />
+          <span class="input-wrap__suffix">元</span>
+        </div>
+      </div>
+
+      <div class="form-group" id="bonusMethodGroup" style="display:none;">
+        <label class="form-label">年终奖计税方式</label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="bonusMethod" value="separate" checked />
+            <span>单独计税</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="bonusMethod" value="combined" />
+            <span>并入综合所得</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- 五险一金 -->
+    <section class="card animate-in animate-in--4">
+      <h2 class="card__title">五险一金</h2>
+
+      <div class="form-group">
+        <label class="form-label">
+          <label class="checkbox-item" style="display:inline-flex;">
+            <input type="checkbox" id="siAutoBase" checked />
+            <span>社保公积金缴费基数</span>
+          </label>
+        </label>
+        <div class="input-wrap">
+          <input class="input" id="siBase" type="number" placeholder="缴费基数" value="15000" min="0" step="100" disabled />
+          <span class="input-wrap__suffix">元/月</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">住房公积金缴存比例</label>
+        <select class="select" id="hfRate">
+          <option value="0.05">5%</option>
+          <option value="0.06">6%</option>
+          <option value="0.07">7%</option>
+          <option value="0.08" selected>8%</option>
+          <option value="0.09">9%</option>
+          <option value="0.10">10%</option>
+          <option value="0.11">11%</option>
+          <option value="0.12">12%</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-item">
+          <input type="checkbox" id="siCustom" />
+          <span>自定义五险一金总额（不使用默认比例）</span>
+        </label>
+      </div>
+
+      <div class="form-group" id="siCustomGroup" style="display:none;">
+        <div class="input-wrap">
+          <input class="input" id="siCustomAmount" type="number" placeholder="请输入每月五险一金个人缴纳总额" value="0" min="0"
+            step="10" />
+          <span class="input-wrap__suffix">元/月</span>
+        </div>
+      </div>
+
+      <div class="si-detail" id="siDetail">
+        <div class="si-detail__row">
+          <span class="si-detail__label">养老保险（8%）</span>
+          <span class="si-detail__value" id="siPension">—</span>
+        </div>
+        <div class="si-detail__row">
+          <span class="si-detail__label">医疗保险（2%）</span>
+          <span class="si-detail__value" id="siMedical">—</span>
+        </div>
+        <div class="si-detail__row">
+          <span class="si-detail__label">失业保险（0.5%）</span>
+          <span class="si-detail__value" id="siUnemploy">—</span>
+        </div>
+        <div class="si-detail__row">
+          <span class="si-detail__label">住房公积金</span>
+          <span class="si-detail__value" id="siHF">—</span>
+        </div>
+        <div class="si-detail__row si-detail__total">
+          <span class="si-detail__label">个人缴纳合计</span>
+          <span class="si-detail__value" id="siTotal">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 专项附加扣除（可折叠） -->
+    <section class="card animate-in animate-in--5">
+      <button class="card__collapse-trigger" id="dedCollapseTrigger" type="button">
+        <h2 class="card__title" style="margin-bottom:0; flex:1;">专项附加扣除</h2>
+        <span class="card__collapse-summary" id="dedSummary">已启用 2 项</span>
+        <svg class="collapse__arrow" id="dedArrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+
+      <div class="card__collapse-body" id="dedCollapseBody">
+        <div class="card__collapse-inner">
+
+      <!-- 子女教育 -->
+      <div class="deduction-row">
+        <div class="deduction-row__checkbox">
+          <label class="checkbox-item">
+            <input type="checkbox" class="deduction-toggle" data-deduction="childEdu" checked />
+          </label>
+        </div>
+        <div class="deduction-row__main">
+          <div class="deduction-row__label">子女教育</div>
+          <div class="deduction-row__desc">满3岁至全日制学历教育，2000元/月/子女</div>
+          <div class="deduction-row__input">
+            <div class="input-wrap" style="flex:1;">
+              <input class="input deduction-amount" data-deduction="childEdu" type="number" value="1" min="0"
+                step="1" />
+              <span class="input-wrap__suffix">个子女</span>
+            </div>
+            <div class="input-wrap" style="flex:1;">
+              <input class="input deduction-result" data-deduction="childEdu" type="number" value="2000" readonly />
+              <span class="input-wrap__suffix">元/月</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3岁以下婴幼儿照护 -->
+      <div class="deduction-row">
+        <div class="deduction-row__checkbox">
+          <label class="checkbox-item">
+            <input type="checkbox" class="deduction-toggle" data-deduction="infant" />
+          </label>
+        </div>
+        <div class="deduction-row__main">
+          <div class="deduction-row__label">3岁以下婴幼儿照护</div>
+          <div class="deduction-row__desc">3周岁以下，2000元/月/婴幼儿</div>
+          <div class="deduction-row__input">
+            <div class="input-wrap" style="flex:1;">
+              <input class="input deduction-amount" data-deduction="infant" type="number" value="1" min="0" step="1" />
+              <span class="input-wrap__suffix">个婴幼儿</span>
+            </div>
+            <div class="input-wrap" style="flex:1;">
+              <input class="input deduction-result" data-deduction="infant" type="number" value="2000" readonly />
+              <span class="input-wrap__suffix">元/月</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 继续教育 -->
+      <div class="deduction-row">
+        <div class="deduction-row__checkbox">
+          <label class="checkbox-item">
+            <input type="checkbox" class="deduction-toggle" data-deduction="contEdu" />
+          </label>
+        </div>
+        <div class="deduction-row__main">
+          <div class="deduction-row__label">继续教育</div>
+          <div class="deduction-row__desc">学历教育400元/月（最长48个月），职业资格3600元/年</div>
+          <div class="deduction-row__input">
+            <select class="select deduction-type" data-deduction="contEdu" style="flex:1;">
+              <option value="degree">学历教育（400元/月）</option>
+              <option value="cert">职业资格（3600元/年）</option>
+            </select>
+            <div class="input-wrap" style="flex:1;">
+              <input class="input deduction-result" data-deduction="contEdu" type="number" value="400" readonly />
+              <span class="input-wrap__suffix">元/月</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 住房贷款利息 -->
+      <div class="deduction-row">
+        <div class="deduction-row__checkbox">
+          <label class="checkbox-item">
+            <input type="checkbox" class="deduction-toggle" data-deduction="loan" id="dedLoan" />
+          </label>
+        </div>
+        <div class="deduction-row__main">
+          <div class="deduction-row__label">住房贷款利息</div>
+          <div class="deduction-row__desc">首套住房贷款，1000元/月，最长240个月</div>
+          <div class="deduction-row__text">
+            <span class="deduction-static-value" data-deduction="loan">1000</span>
+            <span class="deduction-static-unit">元/月</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 住房租金 -->
+      <div class="deduction-row">
+        <div class="deduction-row__checkbox">
+          <label class="checkbox-item">
+            <input type="checkbox" class="deduction-toggle" data-deduction="rent" id="dedRent" />
+          </label>
+        </div>
+        <div class="deduction-row__main">
+          <div class="deduction-row__label">住房租金</div>
+          <div class="deduction-row__desc">与住房贷款利息不可同时享受，扣除标准按所在城市确定</div>
+          <div class="deduction-row__text">
+            <span class="deduction-city-label" id="rentCityLabel">杭州市（第一档·1500元）</span>
+            <span class="deduction-static-value" data-deduction="rent">1500</span>
+            <span class="deduction-static-unit">元/月</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 赡养老人 -->
+      <div class="deduction-row">
+        <div class="deduction-row__checkbox">
+          <label class="checkbox-item">
+            <input type="checkbox" class="deduction-toggle" data-deduction="elder" checked />
+          </label>
+        </div>
+        <div class="deduction-row__main">
+          <div class="deduction-row__label">赡养老人</div>
+          <div class="deduction-row__desc">被赡养人年满60周岁</div>
+          <div class="deduction-row__input">
+            <select class="select deduction-type" data-deduction="elder" style="flex:1;">
+              <option value="only">独生子女（3000元/月）</option>
+              <option value="share">非独生子女（分摊≤1500元/月）</option>
+            </select>
+            <div class="input-wrap" style="flex:1;">
+              <input class="input deduction-result" data-deduction="elder" type="number" value="3000" readonly />
+              <span class="input-wrap__suffix">元/月</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 大病医疗 -->
+      <div class="deduction-row">
+        <div class="deduction-row__checkbox">
+          <label class="checkbox-item">
+            <input type="checkbox" class="deduction-toggle" data-deduction="medical" />
+          </label>
+        </div>
+        <div class="deduction-row__main">
+          <div class="deduction-row__label">大病医疗</div>
+          <div class="deduction-row__desc">医保目录内自付超15000元部分据实扣除，年上限80000元（年度汇算时扣除）</div>
+          <div class="deduction-row__input">
+            <div class="input-wrap" style="flex:1;">
+              <input class="input deduction-amount" data-deduction="medical" type="number" value="0" min="0" step="100"
+                placeholder="年度自付金额" />
+              <span class="input-wrap__suffix">元/年</span>
+            </div>
+          </div>
+        </div>
+      </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 计算按钮 -->
+    <section class="animate-in animate-in--6" style="margin-top: var(--sp-5);">
+      <button class="btn btn--primary" id="calcBtn">
+        <span>计算个税</span>
+      </button>
+    </section>
+
+    <!-- 计算说明（折叠面板） -->
+    <section class="collapse" id="calcNoteCollapse" style="margin-top: var(--sp-5);">
+      <button class="collapse__header" id="collapseHeader" type="button">
+        <span class="collapse__header-left">
+          <span class="collapse__header-icon">ℹ</span>
+          计算说明与税率表
+        </span>
+        <svg class="collapse__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+      <div class="collapse__body">
+        <div class="collapse__inner">
+          <div class="notice" style="margin-bottom: var(--sp-4);">
+            <div class="notice__text">
+              <p><strong>累计预扣法：</strong>每月按累计应纳税所得额计算预扣税额，年初月份扣税较少，年末随累计收入跨档逐渐增多。</p>
+              <p><strong>免征额：</strong>5000元/月（60000元/年）。</p>
+              <p><strong>五险一金：</strong>个人缴纳部分税前扣除，缴费比例及基数上下限按所选城市确定，公积金比例5%-12%可选。</p>
+              <p><strong>年终奖单独计税：</strong>将奖金÷12确定适用税率，政策执行至2027年12月31日。</p>
+              <p><strong>住房贷款利息与住房租金不可同时享受。</strong></p>
+            </div>
+          </div>
+          <p style="font-size:13px; font-weight:600; color:var(--text-1); margin-bottom:var(--sp-3);">
+            综合所得年度税率表（累计预扣预缴同表）</p>
+          <table class="tax-table" style="margin-bottom: var(--sp-5);">
+            <thead>
+              <tr>
+                <th>级数</th>
+                <th>全年应纳税所得额</th>
+                <th>税率</th>
+                <th>速算扣除数</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>≤36,000</td>
+                <td>3%</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>36,000~144,000</td>
+                <td>10%</td>
+                <td>2,520</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>144,000~300,000</td>
+                <td>20%</td>
+                <td>16,920</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>300,000~420,000</td>
+                <td>25%</td>
+                <td>31,920</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>420,000~660,000</td>
+                <td>30%</td>
+                <td>52,920</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>660,000~960,000</td>
+                <td>35%</td>
+                <td>85,920</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>&gt;960,000</td>
+                <td>45%</td>
+                <td>181,920</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size:13px; font-weight:600; color:var(--text-1); margin-bottom:var(--sp-3);">全年一次性奖金税率表（÷12后查找）
+          </p>
+          <table class="tax-table">
+            <thead>
+              <tr>
+                <th>级数</th>
+                <th>月均奖金额</th>
+                <th>税率</th>
+                <th>速算扣除数</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>≤3,000</td>
+                <td>3%</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>3,000~12,000</td>
+                <td>10%</td>
+                <td>210</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>12,000~25,000</td>
+                <td>20%</td>
+                <td>1,410</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>25,000~35,000</td>
+                <td>25%</td>
+                <td>2,660</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>35,000~55,000</td>
+                <td>30%</td>
+                <td>4,410</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>55,000~80,000</td>
+                <td>35%</td>
+                <td>7,160</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>&gt;80,000</td>
+                <td>45%</td>
+                <td>15,160</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 结果模态框 -->
+  <div class="modal" id="resultModal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal__overlay" data-close></div>
+    <article class="modal__card">
+      <button class="modal__close" data-close aria-label="关闭">✕</button>
+      <h2 class="modal__title">个税计算结果</h2>
+
+      <div class="result">
+        <!-- 主要结果 -->
+        <div class="result__header">
+          <div class="result__label">月到手工资（年均）</div>
+          <div class="result__value" id="afterTaxIncome">—</div>
+          <div class="result__sub">月均个税 <strong id="monthlyAvgTax">—</strong> 元　|　有效税率 <strong
+              id="effectiveRate">—</strong></div>
+        </div>
+
+        <!-- 关键指标网格 -->
+        <div class="result__grid">
+          <div class="result__item">
+            <div class="result__item-label">月均应纳税所得额</div>
+            <div class="result__item-value result__item-value--primary" id="monthlyTaxable">—</div>
+          </div>
+          <div class="result__item">
+            <div class="result__item-label">月均个税</div>
+            <div class="result__item-value result__item-value--danger" id="monthlyTax">—</div>
+          </div>
+          <div class="result__item">
+            <div class="result__item-label">全年个税合计</div>
+            <div class="result__item-value result__item-value--danger" id="annualTax">—</div>
+          </div>
+          <div class="result__item">
+            <div class="result__item-label">全年到手收入</div>
+            <div class="result__item-value result__item-value--success" id="annualAfterTax">—</div>
+          </div>
+          <div class="result__item result__item--full" id="bonusResultItem" style="display:none;">
+      <div class="result__item-label">年终奖个税（单独计税）</div>
+      <div class="result__item-value result__item-value--warning" id="bonusTax">—</div>
+     </div>
+     <div class="result__item result__item--full" id="medReimburseItem" style="display:none;">
+      <div class="result__item-label">大病医疗汇算退税</div>
+      <div class="result__item-value result__item-value--success" id="medReimburseValue">—</div>
+     </div>
+        </div>
+
+        <!-- 12月税收分布图 -->
+        <div class="result__section-title">月度税额分布</div>
+        <div class="chart" id="chart"></div>
+
+        <!-- 扣除明细 -->
+        <div class="result__section-title">月度扣除明细</div>
+        <div class="breakdown" id="breakdown"></div>
+      </div>
+
+      <div class="modal__actions">
+        <button class="btn btn--primary" data-close>知道了</button>
+      </div>
+    </article>
+  </div>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="footer__disclaimer">
+      <div class="footer__disclaimer-title">⚠ 免责声明</div>
+      <div class="footer__disclaimer-text">
+        本计算器计算结果仅供参考，实际应缴税额以税务机关核定为准。五险一金缴费比例因地区而异，本工具采用常见默认比例。年终奖单独计税政策执行至2027年12月31日。如有疑问，请咨询当地税务机关或拨打纳税服务热线 12366。
+      </div>
+    </div>
+    <p class="footer__brand">✦ 个税计算器</p>
+    <p>数据来源：国家税务总局 2026年最新税率表</p>
+    <p style="margin-top: 4px;">仅供参考，具体以官方政策为准 © <span id="year"></span></p>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* ========== 税率表 ========== */
+      // 综合所得年度税率表（累计预扣预缴同表）
+      const ANNUAL_TAX_TABLE = [
+        { max: 36000, rate: 0.03, quick: 0 },
+        { max: 144000, rate: 0.10, quick: 2520 },
+        { max: 300000, rate: 0.20, quick: 16920 },
+        { max: 420000, rate: 0.25, quick: 31920 },
+        { max: 660000, rate: 0.30, quick: 52920 },
+        { max: 960000, rate: 0.35, quick: 85920 },
+        { max: Infinity, rate: 0.45, quick: 181920 },
+      ];
+
+      // 全年一次性奖金税率表（奖金÷12后查找）
+      const BONUS_TAX_TABLE = [
+        { max: 3000, rate: 0.03, quick: 0 },
+        { max: 12000, rate: 0.10, quick: 210 },
+        { max: 25000, rate: 0.20, quick: 1410 },
+        { max: 35000, rate: 0.25, quick: 2660 },
+        { max: 55000, rate: 0.30, quick: 4410 },
+        { max: 80000, rate: 0.35, quick: 7160 },
+        { max: Infinity, rate: 0.45, quick: 15160 },
+      ];
+
+      // 五险一金个人缴费比例（默认值，部分城市有差异）
+      const SI_RATES_DEFAULT = {
+        pension: 0.08,
+        medical: 0.02,
+        unemployment: 0.005,
+      };
+
+      // 城市数据：租金扣除档位 + 社保公积金参数
+      // rentTier: 1=1500元, 2=1100元, 3=800元
+      const CITY_DATA = {
+        // 直辖市
+        beijing: { name: "北京", rentTier: 1, siBaseMin: 7162, siBaseMax: 35811, hfBaseMin: 2540, hfBaseMax: 35811, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, medicalExtra: 3, unemployment: 0.005 },
+        shanghai: { name: "上海", rentTier: 1, siBaseMin: 7460, siBaseMax: 37302, hfBaseMin: 2690, hfBaseMax: 37302, hfRateDefault: 0.07, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        tianjin: { name: "天津", rentTier: 1, siBaseMin: 4492, siBaseMax: 24207, hfBaseMin: 2246, hfBaseMax: 24207, hfRateDefault: 0.11, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        chongqing: { name: "重庆", rentTier: 1, siBaseMin: 4465, siBaseMax: 23960, hfBaseMin: 2233, hfBaseMax: 23960, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        // 省会/首府
+        shijiazhuang: { name: "石家庄", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        taiyuan: { name: "太原", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        huhehaote: { name: "呼和浩特", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        shenyang: { name: "沈阳", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        changchun: { name: "长春", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        haerbin: { name: "哈尔滨", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        nanjing: { name: "南京", rentTier: 1, siBaseMin: 4539, siBaseMax: 24003, hfBaseMin: 2265, hfBaseMax: 24003, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        hangzhou: { name: "杭州", rentTier: 1, siBaseMin: 4986, siBaseMax: 25299, hfBaseMin: 2490, hfBaseMax: 40694, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        hefei: { name: "合肥", rentTier: 1, siBaseMin: 4291, siBaseMax: 22172, hfBaseMin: 2146, hfBaseMax: 22172, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        fuzhou: { name: "福州", rentTier: 1, siBaseMin: 4291, siBaseMax: 22172, hfBaseMin: 2146, hfBaseMax: 22172, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        nanchang: { name: "南昌", rentTier: 1, siBaseMin: 4291, siBaseMax: 22172, hfBaseMin: 2146, hfBaseMax: 22172, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        jinan: { name: "济南", rentTier: 1, siBaseMin: 4368, siBaseMax: 22576, hfBaseMin: 2184, hfBaseMax: 22576, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        zhengzhou: { name: "郑州", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        wuhan: { name: "武汉", rentTier: 1, siBaseMin: 4283, siBaseMax: 23531, hfBaseMin: 2188, hfBaseMax: 23531, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        changsha: { name: "长沙", rentTier: 1, siBaseMin: 4434, siBaseMax: 22912, hfBaseMin: 2217, hfBaseMax: 22912, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        guangzhou: { name: "广州", rentTier: 1, siBaseMin: 5510, siBaseMax: 27549, hfBaseMin: 2500, hfBaseMax: 39828, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.002 },
+        nanning: { name: "南宁", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        haikou: { name: "海口", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        chengdu: { name: "成都", rentTier: 1, siBaseMin: 4588, siBaseMax: 22791, hfBaseMin: 2288, hfBaseMax: 30564, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        guiyang: { name: "贵阳", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        kunming: { name: "昆明", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        lasa: { name: "拉萨", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        xian: { name: "西安", rentTier: 1, siBaseMin: 4443, siBaseMax: 22965, hfBaseMin: 2222, hfBaseMax: 22965, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        lanzhou: { name: "兰州", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        xining: { name: "西宁", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        yinchuan: { name: "银川", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        wulumuqi: { name: "乌鲁木齐", rentTier: 1, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        // 计划单列市
+        dalian: { name: "大连", rentTier: 1, siBaseMin: 4368, siBaseMax: 22576, hfBaseMin: 2184, hfBaseMax: 22576, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        qingdao: { name: "青岛", rentTier: 1, siBaseMin: 4368, siBaseMax: 22576, hfBaseMin: 2184, hfBaseMax: 22576, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        ningbo: { name: "宁波", rentTier: 1, siBaseMin: 4327, siBaseMax: 22365, hfBaseMin: 2164, hfBaseMax: 22365, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        xiamen: { name: "厦门", rentTier: 1, siBaseMin: 4291, siBaseMax: 22172, hfBaseMin: 2146, hfBaseMax: 22172, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        shenzhen: { name: "深圳", rentTier: 1, siBaseMin: 6733, siBaseMax: 33666, hfBaseMin: 2360, hfBaseMax: 44265, hfRateDefault: 0.05, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        // 第二档（1100元）主要城市
+        suzhou: { name: "苏州", rentTier: 2, siBaseMin: 4515, siBaseMax: 24003, hfBaseMin: 2265, hfBaseMax: 24003, hfRateDefault: 0.08, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        wuxi: { name: "无锡", rentTier: 2, siBaseMin: 4515, siBaseMax: 24003, hfBaseMin: 2265, hfBaseMax: 24003, hfRateDefault: 0.08, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        foshan: { name: "佛山", rentTier: 2, siBaseMin: 4291, siBaseMax: 22172, hfBaseMin: 2146, hfBaseMax: 22172, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.002 },
+        dongguan: { name: "东莞", rentTier: 2, siBaseMin: 4333, siBaseMax: 22397, hfBaseMin: 2167, hfBaseMax: 22397, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.002 },
+        wenzhou: { name: "温州", rentTier: 2, siBaseMin: 4327, siBaseMax: 22365, hfBaseMin: 2164, hfBaseMax: 22365, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        zhuhai: { name: "珠海", rentTier: 2, siBaseMin: 4291, siBaseMax: 22172, hfBaseMin: 2146, hfBaseMax: 22172, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        xuzhou: { name: "徐州", rentTier: 2, siBaseMin: 4515, siBaseMax: 24003, hfBaseMin: 2265, hfBaseMax: 24003, hfRateDefault: 0.08, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        yantai: { name: "烟台", rentTier: 2, siBaseMin: 4368, siBaseMax: 22576, hfBaseMin: 2184, hfBaseMax: 22576, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        tangshan: { name: "唐山", rentTier: 2, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        luoyang: { name: "洛阳", rentTier: 2, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        xiangyang: { name: "襄阳", rentTier: 2, siBaseMin: 4283, siBaseMax: 23531, hfBaseMin: 2188, hfBaseMax: 23531, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        yichang: { name: "宜昌", rentTier: 2, siBaseMin: 4283, siBaseMax: 23531, hfBaseMin: 2188, hfBaseMax: 23531, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        zhuzhou: { name: "株洲", rentTier: 2, siBaseMin: 4434, siBaseMax: 22912, hfBaseMin: 2217, hfBaseMax: 22912, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        huizhou: { name: "惠州", rentTier: 2, siBaseMin: 4291, siBaseMax: 22172, hfBaseMin: 2146, hfBaseMax: 22172, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        jiangmen: { name: "江门", rentTier: 2, siBaseMin: 4291, siBaseMax: 22172, hfBaseMin: 2146, hfBaseMax: 22172, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        liuzhou: { name: "柳州", rentTier: 2, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        guilin: { name: "桂林", rentTier: 2, siBaseMin: 4405, siBaseMax: 22762, hfBaseMin: 2203, hfBaseMax: 22762, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        nanchong: { name: "南充", rentTier: 2, siBaseMin: 4588, siBaseMax: 22791, hfBaseMin: 2288, hfBaseMax: 30564, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        mianyang: { name: "绵阳", rentTier: 2, siBaseMin: 4588, siBaseMax: 22791, hfBaseMin: 2288, hfBaseMax: 30564, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        baoji: { name: "宝鸡", rentTier: 2, siBaseMin: 4443, siBaseMax: 22965, hfBaseMin: 2222, hfBaseMax: 22965, hfRateDefault: 0.12, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+        // 第三档
+        other_small: { name: "其他城市", rentTier: 3, siBaseMin: 4000, siBaseMax: 20000, hfBaseMin: 2000, hfBaseMax: 20000, hfRateDefault: 0.08, pension: 0.08, medical: 0.02, unemployment: 0.005 },
+      };
+
+      // 租金扣除档位对应金额
+      const RENT_TIER_AMOUNT = { 1: 1500, 2: 1100, 3: 800 };
+      const RENT_TIER_LABEL = { 1: "第一档", 2: "第二档", 3: "第三档" };
+
+      // 基本减除费用
+      const MONTHLY_EXEMPTION = 5000;
+      const ANNUAL_EXEMPTION = 60000;
+
+      /* ========== 状态 ========== */
+      const state = {
+        city: "hangzhou",
+        cityAutoSI: true,
+        salary: 15000,
+        bonus: 0,
+        bonusMethod: "separate",
+        siBase: 15000,
+        siAutoBase: true,
+        hfRate: 0.12,
+        siCustom: false,
+        siCustomAmount: 0,
+        deductions: {
+          childEdu: { enabled: true, monthly: 2000 },
+          infant: { enabled: false, monthly: 2000 },
+          contEdu: { enabled: false, monthly: 400 },
+          loan: { enabled: false, monthly: 1000 },
+          rent: { enabled: false, monthly: 1500 },
+          elder: { enabled: true, monthly: 3000 },
+          medical: { enabled: false, annual: 0 },
+        },
+        dedCollapseOpen: true,
+      };
+
+      /* ========== DOM ========== */
+      const $ = (id) => document.getElementById(id);
+      const els = {
+        citySelect: $("citySelect"),
+        cityAutoSI: $("cityAutoSI"),
+        salary: $("salary"),
+        bonus: $("bonus"),
+        bonusMethodGroup: $("bonusMethodGroup"),
+        siBase: $("siBase"),
+        siAutoBase: $("siAutoBase"),
+        hfRate: $("hfRate"),
+        siCustom: $("siCustom"),
+        siCustomGroup: $("siCustomGroup"),
+        siCustomAmount: $("siCustomAmount"),
+        siDetail: $("siDetail"),
+        siPension: $("siPension"),
+        siMedical: $("siMedical"),
+        siUnemploy: $("siUnemploy"),
+        siHF: $("siHF"),
+        siTotal: $("siTotal"),
+        calcBtn: $("calcBtn"),
+        collapseHeader: $("collapseHeader"),
+        calcNoteCollapse: $("calcNoteCollapse"),
+        dedCollapseTrigger: $("dedCollapseTrigger"),
+        dedCollapseBody: $("dedCollapseBody"),
+        dedSummary: $("dedSummary"),
+        dedArrow: $("dedArrow"),
+        resultModal: $("resultModal"),
+        afterTaxIncome: $("afterTaxIncome"),
+        monthlyAvgTax: $("monthlyAvgTax"),
+        effectiveRate: $("effectiveRate"),
+        monthlyTaxable: $("monthlyTaxable"),
+        monthlyTax: $("monthlyTax"),
+        annualTax: $("annualTax"),
+        annualAfterTax: $("annualAfterTax"),
+        bonusResultItem: $("bonusResultItem"),
+        bonusTax: $("bonusTax"),
+        chart: $("chart"),
+        breakdown: $("breakdown"),
+        dedLoan: $("dedLoan"),
+        dedRent: $("dedRent"),
+        rentCityLabel: $("rentCityLabel"),
+        year: $("year"),
+      };
+
+      /* ========== 工具函数 ========== */
+      function fmtMoney(n) {
+        if (n === 0) return "0";
+        if (!n || isNaN(n)) return "—";
+        return n.toLocaleString("zh-CN", { maximumFractionDigits: 2 });
+      }
+
+      function getInputNum(el) {
+        const v = parseFloat(el.value);
+        return isNaN(v) ? 0 : Math.max(0, v);
+      }
+
+      /* ========== 五险一金计算 ========== */
+      function getCityData() {
+        return CITY_DATA[state.city] || CITY_DATA.other_small;
+      }
+
+      function calcSocialInsurance() {
+        const city = getCityData();
+        if (state.siCustom) {
+          return {
+            pension: 0, medical: 0, unemployment: 0, hf: 0,
+            total: state.siCustomAmount,
+            medicalExtra: 0,
+          };
+        }
+        // 社保基数夹在上下限之间
+        let base = state.siBase;
+        base = Math.max(city.siBaseMin, Math.min(base, city.siBaseMax));
+
+        // 公积金基数可能与社保基数不同（部分城市公积金上限更高）
+        let hfBase = state.siBase;
+        hfBase = Math.max(city.hfBaseMin, Math.min(hfBase, city.hfBaseMax));
+
+        const pension = base * city.pension;
+        const medical = base * city.medical;
+        const unemployment = base * city.unemployment;
+        const medicalExtra = city.medicalExtra || 0; // 北京等城市医疗有固定额外加额
+        const hf = hfBase * state.hfRate;
+        return { pension, medical, unemployment, medicalExtra, hf, total: pension + medical + unemployment + medicalExtra + hf };
+      }
+
+      function renderSIDetail() {
+        const si = calcSocialInsurance();
+        const city = getCityData();
+        // 更新标签显示城市比例
+        const pensionLabel = document.querySelector('#siDetail .si-detail__row:nth-child(1) .si-detail__label');
+        const medicalLabel = document.querySelector('#siDetail .si-detail__row:nth-child(2) .si-detail__label');
+        const unemployLabel = document.querySelector('#siDetail .si-detail__row:nth-child(3) .si-detail__label');
+        if (pensionLabel) pensionLabel.textContent = "养老保险（" + (city.pension * 100).toFixed(0) + "%）";
+        if (medicalLabel) {
+          const extra = si.medicalExtra > 0 ? "+" + si.medicalExtra + "元" : "";
+          medicalLabel.textContent = "医疗保险（" + (city.medical * 100).toFixed(0) + "%"+ extra + "）";
+        }
+        if (unemployLabel) unemployLabel.textContent = "失业保险（" + (city.unemployment * 100).toFixed(1) + "%）";
+
+        els.siPension.textContent = "¥" + fmtMoney(si.pension);
+        els.siMedical.textContent = "¥" + fmtMoney(si.medical + (si.medicalExtra || 0));
+        els.siUnemploy.textContent = "¥" + fmtMoney(si.unemployment);
+        els.siHF.textContent = "¥" + fmtMoney(si.hf);
+        els.siTotal.textContent = "¥" + fmtMoney(si.total);
+      }
+
+      /* ========== 城市切换 ========== */
+      function onCityChange() {
+        state.city = els.citySelect.value;
+        const city = getCityData();
+
+        // 更新住房租金扣除
+        const rentAmount = RENT_TIER_AMOUNT[city.rentTier];
+        state.deductions.rent.monthly = rentAmount;
+        const rentValueEl = document.querySelector('.deduction-static-value[data-deduction="rent"]');
+        if (rentValueEl) rentValueEl.textContent = rentAmount;
+        if (els.rentCityLabel) {
+          els.rentCityLabel.textContent = city.name + "（" + RENT_TIER_LABEL[city.rentTier] + "·" + rentAmount + "元）";
+        }
+
+        // 如果开启城市自动同步社保
+        if (state.cityAutoSI) {
+          // 更新公积金默认比例
+          state.hfRate = city.hfRateDefault;
+          els.hfRate.value = city.hfRateDefault;
+
+          // 更新社保基数（如果之前是自动跟随工资，则重新计算）
+          if (state.siAutoBase) {
+            // 基数夹在城市上下限之间
+            const base = Math.max(city.siBaseMin, Math.min(state.salary, city.siBaseMax));
+            state.siBase = base;
+            els.siBase.value = Math.round(base);
+          }
+        }
+
+        renderSIDetail();
+      }
+
+      /* ========== 专项附加扣除计算 ========== */
+      function calcDeductions() {
+        // 互斥：住房贷款利息 vs 住房租金
+        if (state.deductions.loan.enabled && state.deductions.rent.enabled) {
+          state.deductions.rent.enabled = false;
+        }
+
+        let monthlyTotal = 0;
+        let annualMedical = 0;
+
+        const items = [
+          { key: "childEdu", label: "子女教育", amount: state.deductions.childEdu.enabled ? state.deductions.childEdu.monthly : 0 },
+          { key: "infant", label: "3岁以下婴幼儿照护", amount: state.deductions.infant.enabled ? state.deductions.infant.monthly : 0 },
+          { key: "contEdu", label: "继续教育", amount: state.deductions.contEdu.enabled ? state.deductions.contEdu.monthly : 0 },
+          { key: "loan", label: "住房贷款利息", amount: state.deductions.loan.enabled ? state.deductions.loan.monthly : 0 },
+          { key: "rent", label: "住房租金", amount: state.deductions.rent.enabled ? state.deductions.rent.monthly : 0 },
+          { key: "elder", label: "赡养老人", amount: state.deductions.elder.enabled ? state.deductions.elder.monthly : 0 },
+        ];
+
+        items.forEach((item) => { monthlyTotal += item.amount; });
+
+        // 大病医疗（年度）
+        if (state.deductions.medical.enabled) {
+          const medExp = state.deductions.medical.annual;
+          annualMedical = Math.max(0, Math.min(medExp - 15000, 80000));
+        }
+
+        return {
+          items: items.filter((i) => i.amount > 0),
+          monthlyTotal,
+          annualMedical,
+        };
+      }
+
+      /* ========== 税额计算 ========== */
+      function findBracket(taxable, table) {
+        for (const b of table) {
+          if (taxable <= b.max) return b;
+        }
+        return table[table.length - 1];
+      }
+
+      function calcAnnualTax(annualTaxableIncome) {
+        if (annualTaxableIncome <= 0) return 0;
+        const b = findBracket(annualTaxableIncome, ANNUAL_TAX_TABLE);
+        return annualTaxableIncome * b.rate - b.quick;
+      }
+
+      function calcBonusTax(bonus) {
+        if (bonus <= 0) return 0;
+        const monthly = bonus / 12;
+        const b = findBracket(monthly, BONUS_TAX_TABLE);
+        return bonus * b.rate - b.quick;
+      }
+
+      function calculateTax() {
+        const salary = state.salary;
+        const bonus = state.bonus;
+        const si = calcSocialInsurance();
+        const ded = calcDeductions();
+
+        // 月度可扣除金额（不含大病医疗，大病医疗仅在年度汇算时扣除）
+        const monthlyDeductions = si.total + ded.monthlyTotal;
+        // 月度应纳税所得额（月度预扣用）
+        const monthlyTaxable = Math.max(0, salary - MONTHLY_EXEMPTION - monthlyDeductions);
+        // 年度预扣应纳税所得额
+        const annualTaxable = monthlyTaxable * 12;
+        // 年度汇算应纳税所得额（扣除大病医疗）
+        const annualTaxableAfterMed = Math.max(0, annualTaxable - ded.annualMedical);
+
+        // 累计预扣法：按月计算（月度预扣不包含大病医疗）
+        const monthlyTaxes = [];
+        let cumTaxable = 0;
+        let cumTaxPaid = 0;
+
+        for (let m = 1; m <= 12; m++) {
+          cumTaxable += monthlyTaxable;
+          const cumTax = calcAnnualTax(cumTaxable);
+          const monthTax = Math.max(0, cumTax - cumTaxPaid);
+          cumTaxPaid += monthTax;
+          monthlyTaxes.push({
+            month: m,
+            tax: monthTax,
+            afterTax: salary - si.total - monthTax,
+          });
+        }
+
+        // 年度预扣个税合计（12个月预扣总额，大病医疗为0时等于年度汇算税额）
+        const annualWithholdingTax = monthlyTaxes.reduce((s, m) => s + m.tax, 0);
+
+        // 年度汇算后实际工资个税（扣除大病医疗）
+        const annualSalaryTax = calcAnnualTax(annualTaxableAfterMed);
+
+        // 大病医疗汇算退税额（预扣多缴的部分）
+        const medReimbursement = annualWithholdingTax - annualSalaryTax;
+
+        // 年终奖个税
+        let bonusTaxResult = 0;
+        let bonusMethodLabel = "";
+        if (bonus > 0) {
+          if (state.bonusMethod === "separate") {
+            bonusTaxResult = calcBonusTax(bonus);
+            bonusMethodLabel = "单独计税";
+          } else {
+            // 并入综合所得（使用年度汇算后的应纳税所得额）
+            const combinedTaxable = annualTaxableAfterMed + bonus;
+            const combinedTax = calcAnnualTax(combinedTaxable);
+            bonusTaxResult = combinedTax - annualSalaryTax;
+            bonusMethodLabel = "并入综合所得";
+          }
+        }
+
+        const totalAnnualTax = annualSalaryTax + bonusTaxResult;
+        const annualSalary = salary * 12;
+        const annualSI = si.total * 12;
+        const annualAfterTax = annualSalary + bonus - annualSI - totalAnnualTax;
+        // 月均个税（仅工资部分，不含年终奖）
+        const monthlyAvgTax = annualSalaryTax / 12;
+        // 月到手工资（年均，仅工资部分）
+        const monthlyAfterTax = (annualSalary - annualSI - annualSalaryTax) / 12;
+        const totalIncome = annualSalary + bonus;
+        const effectiveRatePct = totalIncome > 0 ? (totalAnnualTax / totalIncome) * 100 : 0;
+
+        return {
+          monthlyTaxable,
+          monthlyTaxes,
+          annualWithholdingTax,
+          annualSalaryTax,
+          medReimbursement,
+          bonusTax: bonusTaxResult,
+          bonusMethodLabel,
+          totalAnnualTax,
+          annualAfterTax,
+          monthlyAvgTax,
+          monthlyAfterTax,
+          effectiveRatePct,
+          si,
+          ded,
+          salary,
+          bonus,
+          annualSalary,
+          annualSI,
+        };
+      }
+
+      /* ========== 渲染结果 ========== */
+      function renderResult(r) {
+        // 主要结果
+        els.afterTaxIncome.textContent = fmtMoney(Math.round(r.monthlyAfterTax));
+        els.monthlyAvgTax.textContent = fmtMoney(Math.round(r.monthlyAvgTax));
+        els.effectiveRate.textContent = r.effectiveRatePct.toFixed(2) + "%";
+
+        // 关键指标
+        els.monthlyTaxable.textContent = "¥" + fmtMoney(Math.round(r.monthlyTaxable));
+        els.monthlyTax.textContent = "¥" + fmtMoney(Math.round(r.monthlyAvgTax));
+        els.annualTax.textContent = "¥" + fmtMoney(Math.round(r.totalAnnualTax));
+        els.annualAfterTax.textContent = "¥" + fmtMoney(Math.round(r.annualAfterTax));
+
+        // 年终奖
+        if (r.bonus > 0) {
+          els.bonusResultItem.style.display = "";
+          const labelEl = els.bonusResultItem.querySelector(".result__item-label");
+          labelEl.textContent = "年终奖个税（" + r.bonusMethodLabel + "）";
+          els.bonusTax.textContent = "¥" + fmtMoney(Math.round(r.bonusTax));
+        } else {
+          els.bonusResultItem.style.display = "none";
+        }
+
+        // 大病医疗汇算退税
+        const medItem = $("medReimburseItem");
+        if (medItem) {
+          if (r.medReimbursement > 0) {
+            medItem.style.display = "";
+            $("medReimburseValue").textContent = "¥" + fmtMoney(Math.round(r.medReimbursement));
+          } else {
+            medItem.style.display = "none";
+          }
+        }
+
+        // 月度柱状图
+        renderChart(r);
+
+        // 扣除明细
+        renderBreakdown(r);
+      }
+
+      function renderChart(r) {
+        const chart = els.chart;
+        chart.innerHTML = "";
+
+        // 找到最大税额用于缩放
+        const maxTax = Math.max(...r.monthlyTaxes.map((m) => m.tax), 1);
+
+        r.monthlyTaxes.forEach((m) => {
+          const wrap = document.createElement("div");
+          wrap.className = "chart__bar-wrap";
+
+          const bar = document.createElement("div");
+          bar.className = "chart__bar";
+          const heightPct = (m.tax / maxTax) * 100;
+          bar.style.height = Math.max(2, heightPct) + "%";
+          bar.style.transitionDelay = (m.month - 1) * 30 + "ms";
+
+          const monthLabel = document.createElement("span");
+          monthLabel.className = "chart__month";
+          monthLabel.textContent = m.month;
+
+          wrap.appendChild(bar);
+          wrap.appendChild(monthLabel);
+          chart.appendChild(wrap);
+        });
+      }
+
+      function renderBreakdown(r) {
+        const bd = els.breakdown;
+        bd.innerHTML = "";
+
+        const rows = [
+          { label: "税前月薪", value: r.salary },
+          { label: "五险一金（个人）", value: -r.si.total },
+          { label: "基本减除费用", value: MONTHLY_EXEMPTION },
+        ];
+
+        // 专项附加扣除
+        r.ded.items.forEach((item) => {
+          rows.push({ label: item.label, value: -item.amount });
+        });
+
+        // 大病医疗（年度汇算时扣除，不影响月度预扣）
+        if (r.ded.annualMedical > 0) {
+          rows.push({ label: "大病医疗（年度汇算扣除）", value: -r.ded.annualMedical / 12 });
+        }
+
+        rows.push({ label: "月度应纳税所得额（预扣）", value: r.monthlyTaxable, isTotal: true });
+        rows.push({ label: "月均个税（汇算后）", value: -r.monthlyAvgTax, isTax: true });
+
+        rows.forEach((row) => {
+          const div = document.createElement("div");
+          div.className = "breakdown__row" + (row.isTotal ? " breakdown__row--total" : "");
+          const label = document.createElement("span");
+          label.className = "breakdown__label";
+          label.textContent = row.label;
+          const value = document.createElement("span");
+          value.className = "breakdown__value";
+          const sign = row.value < 0 ? "-" : "";
+          value.textContent = sign + "¥" + fmtMoney(Math.abs(Math.round(row.value)));
+          if (row.isTax) {
+            value.style.color = "var(--danger)";
+          }
+          div.appendChild(label);
+          div.appendChild(value);
+          bd.appendChild(div);
+        });
+      }
+
+      /* ========== 模态框控制 ========== */
+      function openModal() {
+        els.resultModal.classList.add("is-open");
+        els.resultModal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeModal() {
+        els.resultModal.classList.remove("is-open");
+        els.resultModal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+
+      /* ========== 同步专项附加扣除UI ========== */
+      function syncDeductionUI() {
+        // 子女教育
+        const childEduCount = getInputNum(document.querySelector('.deduction-amount[data-deduction="childEdu"]'));
+        state.deductions.childEdu.monthly = childEduCount * 2000;
+        document.querySelector('.deduction-result[data-deduction="childEdu"]').value = state.deductions.childEdu.monthly;
+
+        // 婴幼儿照护
+        const infantCount = getInputNum(document.querySelector('.deduction-amount[data-deduction="infant"]'));
+        state.deductions.infant.monthly = infantCount * 2000;
+        document.querySelector('.deduction-result[data-deduction="infant"]').value = state.deductions.infant.monthly;
+
+        // 继续教育
+        const contEduSel = document.querySelector('.deduction-type[data-deduction="contEdu"]');
+        const contEduResult = document.querySelector('.deduction-result[data-deduction="contEdu"]');
+        if (contEduSel.value === "degree") {
+          state.deductions.contEdu.monthly = 400;
+        } else {
+          state.deductions.contEdu.monthly = Math.round(3600 / 12 * 10) / 10;
+        }
+        contEduResult.value = state.deductions.contEdu.monthly;
+
+        // 住房贷款利息
+        state.deductions.loan.monthly = 1000;
+
+        // 住房租金 - 由城市决定，仅同步显示值
+        const rentValueEl = document.querySelector('.deduction-static-value[data-deduction="rent"]');
+        if (rentValueEl) rentValueEl.textContent = state.deductions.rent.monthly;
+
+        // 赡养老人
+        const elderSel = document.querySelector('.deduction-type[data-deduction="elder"]');
+        const elderResult = document.querySelector('.deduction-result[data-deduction="elder"]');
+        if (elderSel.value === "only") {
+          state.deductions.elder.monthly = 3000;
+        } else {
+          state.deductions.elder.monthly = 1500;
+        }
+        elderResult.value = state.deductions.elder.monthly;
+
+        // 大病医疗
+        const medAmount = getInputNum(document.querySelector('.deduction-amount[data-deduction="medical"]'));
+        state.deductions.medical.annual = medAmount;
+
+        // 同步checkbox状态
+        document.querySelectorAll(".deduction-toggle").forEach((cb) => {
+          const key = cb.dataset.deduction;
+          state.deductions[key].enabled = cb.checked;
+        });
+
+        // 互斥：住房贷款利息 vs 住房租金
+        if (state.deductions.loan.enabled && state.deductions.rent.enabled) {
+          state.deductions.rent.enabled = false;
+          const rentToggle = document.querySelector('.deduction-toggle[data-deduction="rent"]');
+          rentToggle.checked = false;
+        }
+
+        // 更新摘要
+        updateDedSummary();
+      }
+
+      /* ========== 扣除摘要 ========== */
+      function updateDedSummary() {
+        let count = 0;
+        for (const key in state.deductions) {
+          if (state.deductions[key].enabled) count++;
+        }
+        if (els.dedSummary) {
+          els.dedSummary.textContent = "已启用 " + count + " 项";
+        }
+      }
+
+      /* ========== 专项扣除折叠面板 ========== */
+      function toggleDedCollapse() {
+        const card = els.dedCollapseTrigger.closest(".card");
+        state.dedCollapseOpen = !state.dedCollapseOpen;
+        if (state.dedCollapseOpen) {
+          card.classList.add("is-open");
+        } else {
+          card.classList.remove("is-open");
+        }
+      }
+
+      /* ========== 事件绑定 ========== */
+      function bindEvents() {
+        // 城市选择
+        els.citySelect.addEventListener("change", onCityChange);
+
+        // 城市自动同步社保
+        els.cityAutoSI.addEventListener("change", () => {
+          state.cityAutoSI = els.cityAutoSI.checked;
+          if (state.cityAutoSI) {
+            onCityChange(); // 立即同步一次
+          }
+        });
+
+        // 专项附加扣除折叠面板
+        els.dedCollapseTrigger.addEventListener("click", toggleDedCollapse);
+
+        // 工资输入
+        els.salary.addEventListener("input", () => {
+          state.salary = getInputNum(els.salary);
+          if (state.siAutoBase) {
+            const city = getCityData();
+            const base = Math.max(city.siBaseMin, Math.min(state.salary, city.siBaseMax));
+            state.siBase = base;
+            els.siBase.value = Math.round(base);
+            renderSIDetail();
+          }
+        });
+
+        // 年终奖输入
+        els.bonus.addEventListener("input", () => {
+          state.bonus = getInputNum(els.bonus);
+          els.bonusMethodGroup.style.display = state.bonus > 0 ? "" : "none";
+        });
+
+        // 年终奖计税方式
+        document.querySelectorAll('input[name="bonusMethod"]').forEach((radio) => {
+          radio.addEventListener("change", (e) => {
+            state.bonusMethod = e.target.value;
+          });
+        });
+
+        // 社保基数自动跟随工资
+        els.siAutoBase.addEventListener("change", () => {
+          state.siAutoBase = els.siAutoBase.checked;
+          els.siBase.disabled = state.siAutoBase;
+          if (state.siAutoBase) {
+            const city = getCityData();
+            const base = Math.max(city.siBaseMin, Math.min(state.salary, city.siBaseMax));
+            state.siBase = base;
+            els.siBase.value = Math.round(base);
+            renderSIDetail();
+          }
+        });
+
+        // 社保基数手动输入
+        els.siBase.addEventListener("input", () => {
+          if (!state.siAutoBase) {
+            state.siBase = getInputNum(els.siBase);
+            renderSIDetail();
+          }
+        });
+
+        // 公积金比例
+        els.hfRate.addEventListener("change", () => {
+          state.hfRate = parseFloat(els.hfRate.value);
+          renderSIDetail();
+        });
+
+        // 自定义五险一金
+        els.siCustom.addEventListener("change", () => {
+          state.siCustom = els.siCustom.checked;
+          els.siCustomGroup.style.display = state.siCustom ? "" : "none";
+          els.siDetail.style.display = state.siCustom ? "none" : "";
+          if (state.siCustom) {
+            state.siCustomAmount = getInputNum(els.siCustomAmount);
+          } else {
+            renderSIDetail();
+          }
+        });
+
+        els.siCustomAmount.addEventListener("input", () => {
+          state.siCustomAmount = getInputNum(els.siCustomAmount);
+        });
+
+        // 专项附加扣除 - checkbox切换
+        document.querySelectorAll(".deduction-toggle").forEach((cb) => {
+          cb.addEventListener("change", () => {
+            syncDeductionUI();
+            // 互斥逻辑
+            if (cb.dataset.deduction === "loan" && cb.checked) {
+              const rentToggle = document.querySelector('.deduction-toggle[data-deduction="rent"]');
+              if (rentToggle.checked) {
+                rentToggle.checked = false;
+                state.deductions.rent.enabled = false;
+              }
+            }
+            if (cb.dataset.deduction === "rent" && cb.checked) {
+              const loanToggle = document.querySelector('.deduction-toggle[data-deduction="loan"]');
+              if (loanToggle.checked) {
+                loanToggle.checked = false;
+                state.deductions.loan.enabled = false;
+              }
+            }
+          });
+        });
+
+        // 专项附加扣除 - 数量/类型变化
+        document.querySelectorAll(".deduction-amount, .deduction-type").forEach((el) => {
+          el.addEventListener("change", syncDeductionUI);
+          el.addEventListener("input", syncDeductionUI);
+        });
+
+        // 计算按钮
+        els.calcBtn.addEventListener("click", () => {
+          syncDeductionUI();
+          const result = calculateTax();
+          renderResult(result);
+          openModal();
+        });
+
+        // 折叠面板
+        els.collapseHeader.addEventListener("click", () => {
+          els.calcNoteCollapse.classList.toggle("is-open");
+        });
+
+        // 模态框关闭
+        els.resultModal.addEventListener("click", (e) => {
+          if (e.target.hasAttribute("data-close") || e.target.closest("[data-close]")) {
+            closeModal();
+          }
+        });
+
+        // ESC关闭
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && els.resultModal.classList.contains("is-open")) {
+            closeModal();
+          }
+        });
+      }
+
+      /* ========== 初始化 ========== */
+      function init() {
+        els.year.textContent = new Date().getFullYear();
+
+        // 初始化城市数据
+        const city = getCityData();
+        state.hfRate = city.hfRateDefault;
+        els.hfRate.value = city.hfRateDefault;
+        state.deductions.rent.monthly = RENT_TIER_AMOUNT[city.rentTier];
+        if (els.rentCityLabel) {
+          els.rentCityLabel.textContent = city.name + "（" + RENT_TIER_LABEL[city.rentTier] + "·" + RENT_TIER_AMOUNT[city.rentTier] + "元）";
+        }
+        // 初始社保基数：工资与城市上下限取中间
+        const base = Math.max(city.siBaseMin, Math.min(state.salary, city.siBaseMax));
+        state.siBase = base;
+        els.siBase.value = Math.round(base);
+
+        renderSIDetail();
+        syncDeductionUI();
+        bindEvents();
+
+        // 专项附加扣除默认展开
+        const dedCard = els.dedCollapseTrigger.closest(".card");
+        dedCard.classList.add("is-open");
+
+        // 导航栏滚动
+        const nav = $("nav");
+        window.addEventListener("scroll", () => {
+          if (window.scrollY > 10) {
+            nav.classList.add("scrolled");
+          } else {
+            nav.classList.remove("scrolled");
+          }
+        }, { passive: true });
+      }
+
+      init();
+    })();
+  </script>
+</body>
+
+</html>
