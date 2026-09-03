@@ -154,6 +154,7 @@
       align-items: center;
       justify-content: center;
       background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      background: linear-gradient(135deg, var(--warning), #d97706);
       border-radius: var(--r-sm);
       font-size: 16px;
     }
@@ -1187,7 +1188,11 @@
   <header class="nav" id="nav">
     <div class="nav__inner">
       <a class="nav__logo" href="#top">
-        <span class="nav__logo-mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg></span>
+        <span class="nav__logo-mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="2" />
+            <line x1="2" y1="10" x2="22" y2="10" />
+          </svg></span>
         <span class="nav__logo-text">个税<em>计算器</em></span>
       </a>
     </div>
@@ -1393,8 +1398,8 @@
       <button class="card__collapse-trigger" id="dedCollapseTrigger" type="button">
         <h2 class="card__title" style="margin-bottom:0; flex:1;">专项附加扣除</h2>
         <span class="card__collapse-summary" id="dedSummary">已启用 2 项</span>
-        <svg class="collapse__arrow" id="dedArrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
+        <svg class="collapse__arrow" id="dedArrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6 9 12 15 18 9" />
         </svg>
       </button>
@@ -1402,153 +1407,154 @@
       <div class="card__collapse-body" id="dedCollapseBody">
         <div class="card__collapse-inner">
 
-      <!-- 子女教育 -->
-      <div class="deduction-row">
-        <div class="deduction-row__checkbox">
-          <label class="checkbox-item">
-            <input type="checkbox" class="deduction-toggle" data-deduction="childEdu" checked />
-          </label>
-        </div>
-        <div class="deduction-row__main">
-          <div class="deduction-row__label">子女教育</div>
-          <div class="deduction-row__desc">满3岁至全日制学历教育，2000元/月/子女</div>
-          <div class="deduction-row__input">
-            <div class="input-wrap" style="flex:1;">
-              <input class="input deduction-amount" data-deduction="childEdu" type="number" value="1" min="0"
-                step="1" />
-              <span class="input-wrap__suffix">个子女</span>
+          <!-- 子女教育 -->
+          <div class="deduction-row">
+            <div class="deduction-row__checkbox">
+              <label class="checkbox-item">
+                <input type="checkbox" class="deduction-toggle" data-deduction="childEdu" checked />
+              </label>
             </div>
-            <div class="input-wrap" style="flex:1;">
-              <input class="input deduction-result" data-deduction="childEdu" type="number" value="2000" readonly />
-              <span class="input-wrap__suffix">元/月</span>
+            <div class="deduction-row__main">
+              <div class="deduction-row__label">子女教育</div>
+              <div class="deduction-row__desc">满3岁至全日制学历教育，2000元/月/子女</div>
+              <div class="deduction-row__input">
+                <div class="input-wrap" style="flex:1;">
+                  <input class="input deduction-amount" data-deduction="childEdu" type="number" value="1" min="0"
+                    step="1" />
+                  <span class="input-wrap__suffix">个子女</span>
+                </div>
+                <div class="input-wrap" style="flex:1;">
+                  <input class="input deduction-result" data-deduction="childEdu" type="number" value="2000" readonly />
+                  <span class="input-wrap__suffix">元/月</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- 3岁以下婴幼儿照护 -->
-      <div class="deduction-row">
-        <div class="deduction-row__checkbox">
-          <label class="checkbox-item">
-            <input type="checkbox" class="deduction-toggle" data-deduction="infant" />
-          </label>
-        </div>
-        <div class="deduction-row__main">
-          <div class="deduction-row__label">3岁以下婴幼儿照护</div>
-          <div class="deduction-row__desc">3周岁以下，2000元/月/婴幼儿</div>
-          <div class="deduction-row__input">
-            <div class="input-wrap" style="flex:1;">
-              <input class="input deduction-amount" data-deduction="infant" type="number" value="1" min="0" step="1" />
-              <span class="input-wrap__suffix">个婴幼儿</span>
+          <!-- 3岁以下婴幼儿照护 -->
+          <div class="deduction-row">
+            <div class="deduction-row__checkbox">
+              <label class="checkbox-item">
+                <input type="checkbox" class="deduction-toggle" data-deduction="infant" />
+              </label>
             </div>
-            <div class="input-wrap" style="flex:1;">
-              <input class="input deduction-result" data-deduction="infant" type="number" value="2000" readonly />
-              <span class="input-wrap__suffix">元/月</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 继续教育 -->
-      <div class="deduction-row">
-        <div class="deduction-row__checkbox">
-          <label class="checkbox-item">
-            <input type="checkbox" class="deduction-toggle" data-deduction="contEdu" />
-          </label>
-        </div>
-        <div class="deduction-row__main">
-          <div class="deduction-row__label">继续教育</div>
-          <div class="deduction-row__desc">学历教育400元/月（最长48个月），职业资格3600元/年</div>
-          <div class="deduction-row__input">
-            <select class="select deduction-type" data-deduction="contEdu" style="flex:1;">
-              <option value="degree">学历教育（400元/月）</option>
-              <option value="cert">职业资格（3600元/年）</option>
-            </select>
-            <div class="input-wrap" style="flex:1;">
-              <input class="input deduction-result" data-deduction="contEdu" type="number" value="400" readonly />
-              <span class="input-wrap__suffix">元/月</span>
+            <div class="deduction-row__main">
+              <div class="deduction-row__label">3岁以下婴幼儿照护</div>
+              <div class="deduction-row__desc">3周岁以下，2000元/月/婴幼儿</div>
+              <div class="deduction-row__input">
+                <div class="input-wrap" style="flex:1;">
+                  <input class="input deduction-amount" data-deduction="infant" type="number" value="1" min="0"
+                    step="1" />
+                  <span class="input-wrap__suffix">个婴幼儿</span>
+                </div>
+                <div class="input-wrap" style="flex:1;">
+                  <input class="input deduction-result" data-deduction="infant" type="number" value="2000" readonly />
+                  <span class="input-wrap__suffix">元/月</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- 住房贷款利息 -->
-      <div class="deduction-row">
-        <div class="deduction-row__checkbox">
-          <label class="checkbox-item">
-            <input type="checkbox" class="deduction-toggle" data-deduction="loan" id="dedLoan" />
-          </label>
-        </div>
-        <div class="deduction-row__main">
-          <div class="deduction-row__label">住房贷款利息</div>
-          <div class="deduction-row__desc">首套住房贷款，1000元/月，最长240个月</div>
-          <div class="deduction-row__text">
-            <span class="deduction-static-value" data-deduction="loan">1000</span>
-            <span class="deduction-static-unit">元/月</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 住房租金 -->
-      <div class="deduction-row">
-        <div class="deduction-row__checkbox">
-          <label class="checkbox-item">
-            <input type="checkbox" class="deduction-toggle" data-deduction="rent" id="dedRent" />
-          </label>
-        </div>
-        <div class="deduction-row__main">
-          <div class="deduction-row__label">住房租金</div>
-          <div class="deduction-row__desc">与住房贷款利息不可同时享受，扣除标准按所在城市确定</div>
-          <div class="deduction-row__text">
-            <span class="deduction-city-label" id="rentCityLabel">杭州市（第一档·1500元）</span>
-            <span class="deduction-static-value" data-deduction="rent">1500</span>
-            <span class="deduction-static-unit">元/月</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 赡养老人 -->
-      <div class="deduction-row">
-        <div class="deduction-row__checkbox">
-          <label class="checkbox-item">
-            <input type="checkbox" class="deduction-toggle" data-deduction="elder" checked />
-          </label>
-        </div>
-        <div class="deduction-row__main">
-          <div class="deduction-row__label">赡养老人</div>
-          <div class="deduction-row__desc">被赡养人年满60周岁</div>
-          <div class="deduction-row__input">
-            <select class="select deduction-type" data-deduction="elder" style="flex:1;">
-              <option value="only">独生子女（3000元/月）</option>
-              <option value="share">非独生子女（分摊≤1500元/月）</option>
-            </select>
-            <div class="input-wrap" style="flex:1;">
-              <input class="input deduction-result" data-deduction="elder" type="number" value="3000" readonly />
-              <span class="input-wrap__suffix">元/月</span>
+          <!-- 继续教育 -->
+          <div class="deduction-row">
+            <div class="deduction-row__checkbox">
+              <label class="checkbox-item">
+                <input type="checkbox" class="deduction-toggle" data-deduction="contEdu" />
+              </label>
+            </div>
+            <div class="deduction-row__main">
+              <div class="deduction-row__label">继续教育</div>
+              <div class="deduction-row__desc">学历教育400元/月（最长48个月），职业资格3600元/年</div>
+              <div class="deduction-row__input">
+                <select class="select deduction-type" data-deduction="contEdu" style="flex:1;">
+                  <option value="degree">学历教育（400元/月）</option>
+                  <option value="cert">职业资格（3600元/年）</option>
+                </select>
+                <div class="input-wrap" style="flex:1;">
+                  <input class="input deduction-result" data-deduction="contEdu" type="number" value="400" readonly />
+                  <span class="input-wrap__suffix">元/月</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- 大病医疗 -->
-      <div class="deduction-row">
-        <div class="deduction-row__checkbox">
-          <label class="checkbox-item">
-            <input type="checkbox" class="deduction-toggle" data-deduction="medical" />
-          </label>
-        </div>
-        <div class="deduction-row__main">
-          <div class="deduction-row__label">大病医疗</div>
-          <div class="deduction-row__desc">医保目录内自付超15000元部分据实扣除，年上限80000元（年度汇算时扣除）</div>
-          <div class="deduction-row__input">
-            <div class="input-wrap" style="flex:1;">
-              <input class="input deduction-amount" data-deduction="medical" type="number" value="0" min="0" step="100"
-                placeholder="年度自付金额" />
-              <span class="input-wrap__suffix">元/年</span>
+          <!-- 住房贷款利息 -->
+          <div class="deduction-row">
+            <div class="deduction-row__checkbox">
+              <label class="checkbox-item">
+                <input type="checkbox" class="deduction-toggle" data-deduction="loan" id="dedLoan" />
+              </label>
+            </div>
+            <div class="deduction-row__main">
+              <div class="deduction-row__label">住房贷款利息</div>
+              <div class="deduction-row__desc">首套住房贷款，1000元/月，最长240个月</div>
+              <div class="deduction-row__text">
+                <span class="deduction-static-value" data-deduction="loan">1000</span>
+                <span class="deduction-static-unit">元/月</span>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+
+          <!-- 住房租金 -->
+          <div class="deduction-row">
+            <div class="deduction-row__checkbox">
+              <label class="checkbox-item">
+                <input type="checkbox" class="deduction-toggle" data-deduction="rent" id="dedRent" />
+              </label>
+            </div>
+            <div class="deduction-row__main">
+              <div class="deduction-row__label">住房租金</div>
+              <div class="deduction-row__desc">与住房贷款利息不可同时享受，扣除标准按所在城市确定</div>
+              <div class="deduction-row__text">
+                <span class="deduction-city-label" id="rentCityLabel">杭州市（第一档·1500元）</span>
+                <span class="deduction-static-value" data-deduction="rent">1500</span>
+                <span class="deduction-static-unit">元/月</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 赡养老人 -->
+          <div class="deduction-row">
+            <div class="deduction-row__checkbox">
+              <label class="checkbox-item">
+                <input type="checkbox" class="deduction-toggle" data-deduction="elder" checked />
+              </label>
+            </div>
+            <div class="deduction-row__main">
+              <div class="deduction-row__label">赡养老人</div>
+              <div class="deduction-row__desc">被赡养人年满60周岁</div>
+              <div class="deduction-row__input">
+                <select class="select deduction-type" data-deduction="elder" style="flex:1;">
+                  <option value="only">独生子女（3000元/月）</option>
+                  <option value="share">非独生子女（分摊≤1500元/月）</option>
+                </select>
+                <div class="input-wrap" style="flex:1;">
+                  <input class="input deduction-result" data-deduction="elder" type="number" value="3000" readonly />
+                  <span class="input-wrap__suffix">元/月</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 大病医疗 -->
+          <div class="deduction-row">
+            <div class="deduction-row__checkbox">
+              <label class="checkbox-item">
+                <input type="checkbox" class="deduction-toggle" data-deduction="medical" />
+              </label>
+            </div>
+            <div class="deduction-row__main">
+              <div class="deduction-row__label">大病医疗</div>
+              <div class="deduction-row__desc">医保目录内自付超15000元部分据实扣除，年上限80000元（年度汇算时扣除）</div>
+              <div class="deduction-row__input">
+                <div class="input-wrap" style="flex:1;">
+                  <input class="input deduction-amount" data-deduction="medical" type="number" value="0" min="0"
+                    step="100" placeholder="年度自付金额" />
+                  <span class="input-wrap__suffix">元/年</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -1735,13 +1741,13 @@
             <div class="result__item-value result__item-value--success" id="annualAfterTax">—</div>
           </div>
           <div class="result__item result__item--full" id="bonusResultItem" style="display:none;">
-      <div class="result__item-label">年终奖个税（单独计税）</div>
-      <div class="result__item-value result__item-value--warning" id="bonusTax">—</div>
-     </div>
-     <div class="result__item result__item--full" id="medReimburseItem" style="display:none;">
-      <div class="result__item-label">大病医疗汇算退税</div>
-      <div class="result__item-value result__item-value--success" id="medReimburseValue">—</div>
-     </div>
+            <div class="result__item-label">年终奖个税（单独计税）</div>
+            <div class="result__item-value result__item-value--warning" id="bonusTax">—</div>
+          </div>
+          <div class="result__item result__item--full" id="medReimburseItem" style="display:none;">
+            <div class="result__item-label">大病医疗汇算退税</div>
+            <div class="result__item-value result__item-value--success" id="medReimburseValue">—</div>
+          </div>
         </div>
 
         <!-- 12月税收分布图 -->
@@ -2002,7 +2008,7 @@
         if (pensionLabel) pensionLabel.textContent = "养老保险（" + (city.pension * 100).toFixed(0) + "%）";
         if (medicalLabel) {
           const extra = si.medicalExtra > 0 ? "+" + si.medicalExtra + "元" : "";
-          medicalLabel.textContent = "医疗保险（" + (city.medical * 100).toFixed(0) + "%"+ extra + "）";
+          medicalLabel.textContent = "医疗保险（" + (city.medical * 100).toFixed(0) + "%" + extra + "）";
         }
         if (unemployLabel) unemployLabel.textContent = "失业保险（" + (city.unemployment * 100).toFixed(1) + "%）";
 

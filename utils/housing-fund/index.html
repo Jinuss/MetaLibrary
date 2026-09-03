@@ -155,8 +155,15 @@
     }
 
     .nav__logo-mark {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: var(--primary);
-      font-size: 18px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border-radius: var(--r-sm);
+      font-size: 16px;
     }
 
     .nav__logo-text {
@@ -1055,7 +1062,11 @@
   <header class="nav" id="nav">
     <div class="nav__inner">
       <a class="nav__logo" href="#top">
-        <span class="nav__logo-mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z" /><path d="M9 12l2 2 4-4" /></svg></span>
+        <span class="nav__logo-mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z" />
+            <path d="M9 12l2 2 4-4" />
+          </svg></span>
         <span class="nav__logo-text">公积金<em>计算器</em></span>
       </a>
     </div>
@@ -1256,7 +1267,8 @@
       <div class="form-group">
         <label class="form-label">期望贷款金额</label>
         <div class="input-wrap">
-          <input class="input" id="loanAmount" type="number" value="800000" min="0" step="10000" placeholder="请输入期望贷款金额" />
+          <input class="input" id="loanAmount" type="number" value="800000" min="0" step="10000"
+            placeholder="请输入期望贷款金额" />
           <span class="input-wrap__suffix">元</span>
         </div>
       </div>
@@ -1350,19 +1362,84 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td>北京</td><td>120万</td><td>240万</td><td>年限挂钩</td></tr>
-              <tr><td>上海</td><td>60万</td><td>120万</td><td>—</td></tr>
-              <tr><td>广州</td><td>80万</td><td>120万</td><td>8倍</td></tr>
-              <tr><td>深圳</td><td>60万</td><td>110万</td><td>14倍</td></tr>
-              <tr><td>杭州</td><td>90万</td><td>180万</td><td>20倍</td></tr>
-              <tr><td>成都</td><td>60万</td><td>100万</td><td>20倍</td></tr>
-              <tr><td>武汉</td><td>120万</td><td>150万</td><td>20倍</td></tr>
-              <tr><td>南京</td><td>50万</td><td>100万</td><td>15倍</td></tr>
-              <tr><td>苏州</td><td>120万</td><td>150万</td><td>15倍</td></tr>
-              <tr><td>天津</td><td>60万</td><td>80万</td><td>20倍</td></tr>
-              <tr><td>重庆</td><td>100万</td><td>200万</td><td>20倍</td></tr>
-              <tr><td>西安</td><td>90万</td><td>120万</td><td>15倍</td></tr>
-              <tr><td>其他城市</td><td>60万</td><td>100万</td><td>15倍</td></tr>
+              <tr>
+                <td>北京</td>
+                <td>120万</td>
+                <td>240万</td>
+                <td>年限挂钩</td>
+              </tr>
+              <tr>
+                <td>上海</td>
+                <td>60万</td>
+                <td>120万</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>广州</td>
+                <td>80万</td>
+                <td>120万</td>
+                <td>8倍</td>
+              </tr>
+              <tr>
+                <td>深圳</td>
+                <td>60万</td>
+                <td>110万</td>
+                <td>14倍</td>
+              </tr>
+              <tr>
+                <td>杭州</td>
+                <td>90万</td>
+                <td>180万</td>
+                <td>20倍</td>
+              </tr>
+              <tr>
+                <td>成都</td>
+                <td>60万</td>
+                <td>100万</td>
+                <td>20倍</td>
+              </tr>
+              <tr>
+                <td>武汉</td>
+                <td>120万</td>
+                <td>150万</td>
+                <td>20倍</td>
+              </tr>
+              <tr>
+                <td>南京</td>
+                <td>50万</td>
+                <td>100万</td>
+                <td>15倍</td>
+              </tr>
+              <tr>
+                <td>苏州</td>
+                <td>120万</td>
+                <td>150万</td>
+                <td>15倍</td>
+              </tr>
+              <tr>
+                <td>天津</td>
+                <td>60万</td>
+                <td>80万</td>
+                <td>20倍</td>
+              </tr>
+              <tr>
+                <td>重庆</td>
+                <td>100万</td>
+                <td>200万</td>
+                <td>20倍</td>
+              </tr>
+              <tr>
+                <td>西安</td>
+                <td>90万</td>
+                <td>120万</td>
+                <td>15倍</td>
+              </tr>
+              <tr>
+                <td>其他城市</td>
+                <td>60万</td>
+                <td>100万</td>
+                <td>15倍</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -1382,7 +1459,8 @@
         <div class="result__header">
           <div class="result__label">月还款额（首月）</div>
           <div class="result__value" id="monthlyPayment">—</div>
-          <div class="result__sub">贷款总额 <strong id="actualLoanAmount">—</strong> 元　|　贷款年限 <strong id="actualYears">—</strong> 年</div>
+          <div class="result__sub">贷款总额 <strong id="actualLoanAmount">—</strong> 元　|　贷款年限 <strong
+              id="actualYears">—</strong> 年</div>
         </div>
 
         <!-- 关键指标网格 -->
@@ -1703,9 +1781,11 @@
         const r = annualRate / 12;
         if (r === 0) {
           const m = principal / n;
-          return { monthly: m, schedule: Array.from({ length: n }, (_, i) => ({
-            month: i + 1, payment: m, principal: m, interest: 0, remaining: principal - m * (i + 1)
-          }))};
+          return {
+            monthly: m, schedule: Array.from({ length: n }, (_, i) => ({
+              month: i + 1, payment: m, principal: m, interest: 0, remaining: principal - m * (i + 1)
+            }))
+          };
         }
         const monthly = principal * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
         const schedule = [];
