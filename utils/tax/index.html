@@ -1187,7 +1187,7 @@
   <header class="nav" id="nav">
     <div class="nav__inner">
       <a class="nav__logo" href="#top">
-        <span class="nav__logo-mark">✦</span>
+        <span class="nav__logo-mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg></span>
         <span class="nav__logo-text">个税<em>计算器</em></span>
       </a>
     </div>
@@ -2265,7 +2265,7 @@
         const rows = [
           { label: "税前月薪", value: r.salary },
           { label: "五险一金（个人）", value: -r.si.total },
-          { label: "基本减除费用", value: MONTHLY_EXEMPTION },
+          { label: "基本减除费用", value: -MONTHLY_EXEMPTION },
         ];
 
         // 专项附加扣除
@@ -2273,12 +2273,14 @@
           rows.push({ label: item.label, value: -item.amount });
         });
 
+        rows.push({ label: "月度应纳税所得额（预扣）", value: r.monthlyTaxable, isTotal: true });
+
         // 大病医疗（年度汇算时扣除，不影响月度预扣）
         if (r.ded.annualMedical > 0) {
           rows.push({ label: "大病医疗（年度汇算扣除）", value: -r.ded.annualMedical / 12 });
+          rows.push({ label: "年度汇算应纳税所得额", value: r.monthlyTaxable - r.ded.annualMedical / 12, isTotal: true });
         }
 
-        rows.push({ label: "月度应纳税所得额（预扣）", value: r.monthlyTaxable, isTotal: true });
         rows.push({ label: "月均个税（汇算后）", value: -r.monthlyAvgTax, isTax: true });
 
         rows.forEach((row) => {
