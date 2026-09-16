@@ -13,3 +13,12 @@
 
 > 图片搜索
 > https://www.pixiv.net/search?q=%E4%BB%99%E9%80%86&s_mode=tag&type=artwork&r=1
+
+
+2025年全国教育事业发展统计公报
+
+http://www.moe.gov.cn/jyb_sjzl/sjzl_fztjgb/202607/t20260706_1442870.html 
+
+
+2024年全国教育事业发展统计公报
+https://hudong.moe.gov.cn/jyb_sjzl/sjzl_fztjgb/202506/t20250611_1193760.html
