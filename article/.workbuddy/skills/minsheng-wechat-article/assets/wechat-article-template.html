@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>【文章标题写在这里】</title>
+<!--
+  ============================================================
+  民生公众号文章 · 一键复制交付页
+  ------------------------------------------------------------
+  用法：
+    1. 用浏览器打开本文件（双击即可，推荐 Chrome / Edge）
+    2. 点左上角「一键复制到微信」
+    3. 打开公众号后台 → 新的创作 → 图文消息 → 直接 Ctrl+V
+
+  编码约定（防乱码）：
+    - 本文件必须保存为 UTF-8（不加 BOM）
+    - <meta charset="UTF-8"> 必须在 head 最前面
+    - 正文样式全部内联，微信编辑器会剥离 <style> 与 class
+    - 图片位置用注释标注，粘贴后在编辑器内手动插入
+
+  主题色：正文 #3F3F3F / 强调 #A62B2B / 辅助灰 #888888
+  ============================================================
+-->
+<style>
+  /* 以下样式仅用于本地预览，不会被复制进微信 */
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0; background: #EDEDED;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .toolbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 58px; z-index: 99;
+    display: flex; align-items: center; gap: 14px; padding: 0 24px;
+    background: #FFFFFF; border-bottom: 1px solid #E5E5E5;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, .06);
+  }
+  .toolbar button {
+    background: #07C160; color: #FFF; border: none; border-radius: 6px;
+    padding: 10px 24px; font-size: 15px; font-family: inherit;
+    cursor: pointer; transition: background .15s;
+  }
+  .toolbar button:hover { background: #06AD56; }
+  .toolbar button:active { background: #059748; }
+  .toolbar .status { font-size: 14px; }
+  .toolbar .tip { font-size: 13px; color: #999; margin-left: auto; }
+  .page { max-width: 677px; margin: 82px auto 60px; background: #FFF; }
+  .page-inner { padding: 26px 22px 44px; }
+  @media (max-width: 720px) {
+    .toolbar { padding: 0 14px; gap: 10px; }
+    .toolbar .tip { display: none; }
+    .page { margin: 72px 8px 40px; }
+    .page-inner { padding: 20px 16px 32px; }
+  }
+  /* 标题预览区（仅本地可见，不进微信正文） */
+  .head-preview { max-width: 677px; margin: 82px auto 0; background: #FFF; padding: 24px 22px 0; }
+  .head-preview h1 { margin: 0 0 10px; font-size: 22px; line-height: 1.45; color: #222; font-weight: 700; }
+  .head-preview .meta { font-size: 14px; color: #888; line-height: 1.6; padding-bottom: 18px; border-bottom: 1px dashed #E5E5E5; }
+  .head-preview .meta b { color: #A62B2B; font-weight: 600; }
+  @media (max-width: 720px) { .head-preview { margin: 72px 8px 0; padding: 18px 16px 0; } }
+</style>
+</head>
+<body>
+
+<!-- ===================== 工具栏（不进正文） ===================== -->
+<div class="toolbar">
+  <button id="copyBtn" type="button">一键复制到微信</button>
+  <span class="status" id="status"></span>
+  <span class="tip">点按钮 → 公众号后台「新的创作」→ Ctrl+V 粘贴</span>
+</div>
+
+<!-- ===================== 标题与摘要（仅供核对，不进正文） ===================== -->
+<div class="head-preview">
+  <h1>【文章标题写在这里】</h1>
+  <div class="meta">
+    <b>摘要</b>：【≤120 字，前 30 字含核心关键词】<br>
+    <b>话题标签</b>：#标签1　#标签2　#标签3
+  </div>
+</div>
+
+<!-- ===================== 正文开始：以下内容会被复制 ===================== -->
+<div class="page">
+<div class="page-inner">
+<div id="article">
+
+<section style="font-size:16px;color:#3F3F3F;line-height:1.75;letter-spacing:0.5px;text-align:left;">
+
+  <!-- ===== 开头：直接上结论，不放问候语 ===== -->
+  <p style="margin:0 0 16px 0;font-size:16px;color:#3F3F3F;line-height:1.75;">
+    开头段。前 54 字要能独立成句、并包含核心关键词——未填摘要时微信会自动抓取这一段。
+  </p>
+
+  <p style="margin:0 0 24px 0;font-size:16px;color:#3F3F3F;line-height:1.75;">
+    <strong style="color:#A62B2B;">一句话给出核心结论</strong>，让读者立刻知道这件事和自己有什么关系。
+  </p>
+
+  <!-- ===== 小标题 ===== -->
+  <p style="margin:32px 0 16px 0;font-size:17px;font-weight:bold;color:#222222;line-height:1.6;">
+    ▪ 小标题用说人话的短句
+  </p>
+
+  <p style="margin:0 0 16px 0;font-size:16px;color:#3F3F3F;line-height:1.75;">
+    正文段落。每段控制在 1-4 行，超过就拆开。写完自问：删掉这句，读者得到的信息有没有变少。
+  </p>
+
+  <p style="margin:0 0 16px 0;font-size:16px;color:#3F3F3F;line-height:1.75;">
+    关键数字、金额、时间节点单独加粗：<strong style="color:#A62B2B;">2026 年 10 月 31 日</strong>前提交，过期需要重新排队。每屏加粗不超过 2-3 处。
+  </p>
+
+  <!-- 图 1：配图位置，宽度建议 1080px -->
+
+  <!-- ===== 数据卡片 ===== -->
+  <section style="margin:24px 0;padding:16px 18px;background-color:#F7F7F7;border-left:3px solid #A62B2B;">
+    <p style="margin:0 0 6px 0;font-size:14px;color:#888888;line-height:1.6;">每月少缴</p>
+    <p style="margin:0;font-size:24px;font-weight:bold;color:#A62B2B;line-height:1.4;">87 元</p>
+    <p style="margin:6px 0 0 0;font-size:14px;color:#888888;line-height:1.6;">按最低缴费档测算，一年约 1044 元</p>
+  </section>
+
+  <!-- ===== 政策原文引用 ===== -->
+  <section style="margin:24px 0;padding:14px 18px;background-color:#FAFAFA;border-left:3px solid #DDDDDD;">
+    <p style="margin:0;font-size:15px;color:#666666;line-height:1.7;">
+      引用政策原文时用这个样式，与正文区分。「……」按原文照录，不做改写。
+    </p>
+  </section>
+
+  <!-- ===== 怎么办：分条列出 ===== -->
+  <p style="margin:32px 0 16px 0;font-size:17px;font-weight:bold;color:#222222;line-height:1.6;">
+    ▪ 怎么办：三步办完
+  </p>
+
+  <p style="margin:0 0 12px 0;font-size:16px;color:#3F3F3F;line-height:1.75;">
+    <strong style="color:#A62B2B;">1.</strong> 找谁：参保地社保经办机构或线上渠道
+  </p>
+  <p style="margin:0 0 12px 0;font-size:16px;color:#3F3F3F;line-height:1.75;">
+    <strong style="color:#A62B2B;">2.</strong> 带什么：身份证、社保卡
+  </p>
+  <p style="margin:0 0 12px 0;font-size:16px;color:#3F3F3F;line-height:1.75;">
+    <strong style="color:#A62B2B;">3.</strong> 什么时候截止：<strong style="color:#A62B2B;">10 月 31 日</strong>
+  </p>
+
+  <!-- ===== 结尾：一句话收束，不喊口号 ===== -->
+  <p style="margin:24px 0 16px 0;font-size:16px;color:#3F3F3F;line-height:1.75;">
+    结尾落在读者身上，一句话说清楚。不写「让我们一起期待美好的明天」这类空话。
+  </p>
+
+  <!-- 分割线 -->
+  <p style="margin:32px 0 20px 0;text-align:center;font-size:14px;color:#CCCCCC;line-height:1;">· · ·</p>
+
+  <!-- ===== 结尾固定区 ===== -->
+  <section style="margin:0;padding:16px 18px;background-color:#F7F7F7;">
+    <p style="margin:0 0 8px 0;font-size:14px;color:#666666;line-height:1.7;">
+      <strong style="color:#333333;">往期推荐</strong>
+    </p>
+    <p style="margin:0 0 12px 0;font-size:14px;color:#666666;line-height:1.7;">
+      · 关联往期同主题文章一（超链接）<br>
+      · 关联往期同主题文章二（超链接）
+    </p>
+    <p style="margin:0;font-size:14px;color:#888888;line-height:1.7;">
+      你所在的城市办这项业务需要几天？留言说说。
+    </p>
+  </section>
+
+</section>
+
+</div><!-- /#article -->
+</div>
+</div>
+<!-- ===================== 正文结束 ===================== -->
+
+<script>
+(function () {
+  var btn = document.getElementById('copyBtn');
+  var status = document.getElementById('status');
+
+  function flash(msg, ok) {
+    status.textContent = msg;
+    status.style.color = ok ? '#07C160' : '#E64340';
+    window.setTimeout(function () { status.textContent = ''; }, 4000);
+  }
+
+  // 兜底方案：选中正文后用 execCommand 复制，兼容 file:// 直接打开的情况
+  function fallbackCopy(el) {
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    sel.removeAllRanges();
+    flash(ok ? '已复制，去公众号后台 Ctrl+V 粘贴' : '复制被浏览器拦截，请手动全选正文后复制',
+          ok);
+  }
+
+  btn.addEventListener('click', function () {
+    var el = document.getElementById('article');
+    var html = el.innerHTML;
+    var text = el.innerText;
+
+    // 首选方案：剪贴板 API 写入 text/html，保留全部内联样式
+    if (navigator.clipboard && window.ClipboardItem) {
+      var item = new ClipboardItem({
+        'text/html':  new Blob([html], { type: 'text/html'  }),
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      });
+      navigator.clipboard.write([item]).then(function () {
+        flash('已复制，去公众号后台 Ctrl+V 粘贴', true);
+      }).catch(function () {
+        fallbackCopy(el);
+      });
+      return;
+    }
+
+    fallbackCopy(el);
+  });
+})();
+</script>
+
+</body>
+</html>

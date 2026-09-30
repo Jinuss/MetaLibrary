@@ -22,8 +22,6 @@ http://www.moe.gov.cn/jyb_sjzl/sjzl_fztjgb/202607/t20260706_1442870.html
 身高
 https://www.nhc.gov.cn/ewebeditor/uploadfile/2018/07/20180704145256369.pdf
 
-公积金
-https://www.gov.cn/zhengce/zhengceku/202608/content_7078478.htm
 
 2024年全国教育事业发展统计公报
 https://hudong.moe.gov.cn/jyb_sjzl/sjzl_fztjgb/202506/t20250611_1193760.html
