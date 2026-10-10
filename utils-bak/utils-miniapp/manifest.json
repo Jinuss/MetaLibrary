@@ -1,0 +1,76 @@
+{
+  "name": "实用工具集",
+  "appid": "__UNI__UTILSTOOLS",
+  "description": "退休年龄、退休金、房贷、个税、公积金等实用计算工具集合",
+  "versionName": "1.0.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "app-plus": {
+    "usingComponents": true,
+    "nvueStyleCompiler": "uni-app",
+    "compilerVersion": 3,
+    "splashscreen": {
+      "alwaysShowBeforeRender": true,
+      "waiting": true,
+      "autoclose": true,
+      "delay": 0
+    },
+    "modules": {},
+    "distribute": {
+      "android": {
+        "permissions": [
+          "<uses-permission android:name=\"android.permission.INTERNET\"/>"
+        ]
+      },
+      "ios": {},
+      "sdkConfigs": {}
+    }
+  },
+  "quickapp": {},
+  "mp-weixin": {
+    "appid": "",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "minified": true,
+      "postcss": true
+    },
+    "usingComponents": true,
+    "permission": {},
+    "optimization": {
+      "subPackages": true
+    }
+  },
+  "mp-alipay": {
+    "usingComponents": true,
+    "setting": {
+      "urlCheck": false,
+      "minified": true
+    }
+  },
+  "mp-toutiao": {
+    "appid": "",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "minified": true
+    },
+    "usingComponents": true
+  },
+  "mp-baidu": {
+    "usingComponents": true
+  },
+  "h5": {
+    "title": "实用工具集",
+    "router": {
+      "mode": "hash",
+      "base": "./"
+    },
+    "devServer": {
+      "port": 8080
+    },
+    "publicPath": "./",
+    "template": "index.html"
+  },
+  "vueVersion": "3"
+}

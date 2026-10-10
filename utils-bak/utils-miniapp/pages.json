@@ -1,0 +1,73 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {}
+  },
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "实用工具集",
+        "backgroundColor": "#07070f",
+        "backgroundColorTop": "#07070f",
+        "backgroundColorBottom": "#07070f"
+      }
+    },
+    {
+      "path": "pages/retirement/index",
+      "style": {
+        "navigationBarTitleText": "法定退休年龄计算器",
+        "navigationBarBackgroundColor": "#0b0b14",
+        "navigationBarTextStyle": "white",
+        "backgroundColor": "#07070f"
+      }
+    },
+    {
+      "path": "pages/pension/index",
+      "style": {
+        "navigationBarTitleText": "退休金计算器",
+        "navigationBarBackgroundColor": "#0b0b14",
+        "navigationBarTextStyle": "white",
+        "backgroundColor": "#07070f"
+      }
+    },
+    {
+      "path": "pages/early-repayment/index",
+      "style": {
+        "navigationBarTitleText": "提前还贷计算器",
+        "navigationBarBackgroundColor": "#0b0b14",
+        "navigationBarTextStyle": "white",
+        "backgroundColor": "#07070f"
+      }
+    },
+    {
+      "path": "pages/tax/index",
+      "style": {
+        "navigationBarTitleText": "个税计算器",
+        "navigationBarBackgroundColor": "#0b0b14",
+        "navigationBarTextStyle": "white",
+        "backgroundColor": "#07070f"
+      }
+    },
+    {
+      "path": "pages/housing-fund/index",
+      "style": {
+        "navigationBarTitleText": "公积金贷款计算器",
+        "navigationBarBackgroundColor": "#0b0b14",
+        "navigationBarTextStyle": "white",
+        "backgroundColor": "#07070f"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "实用工具集",
+    "navigationBarBackgroundColor": "#0b0b14",
+    "backgroundColor": "#07070f",
+    "backgroundTextStyle": "light",
+    "app-plus": {
+      "background": "#07070f"
+    }
+  }
+}
